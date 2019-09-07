@@ -40,7 +40,7 @@ void PF_ActionDrawLine::trigger()
 {
     PF_ActionPreviewInterface::trigger();
 
-    PF_Line * line = new PF_Line(container,view, *data);
+    PF_Line * line = new PF_Line(container,view, *data);    //container没用上？？
     container->addEntity(line);
     setStatus(SetStartpoint);
     reset();

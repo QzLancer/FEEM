@@ -1,8 +1,4 @@
-# if defined(UNDER_CE)
-#  include <winbase.h>
-# else
-#  include <windows.h>
-# endif
+#include <windows.h>
 
 VS_VERSION_INFO VERSIONINFO
 	FILEVERSION 3,2,5,0

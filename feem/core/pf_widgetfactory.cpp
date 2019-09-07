@@ -171,6 +171,11 @@ void PF_WidgetFactory::createRibbon()
     {
         createGroupPlot(pageResults);
     }
+
+    if (Qtitan::RibbonPage* pageTest = mainwindow->ribbonBar()->addPage(tr("&test")))
+    {
+        createGroupDraw(pageTest);
+    }
 }
 
 void PF_WidgetFactory::createStatusBar()

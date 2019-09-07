@@ -65,7 +65,7 @@ void MainWindow::init()
     PF_ActionFactory a_factory(this, actionHandler);
     a_factory.fillActionContainer(a_map,ag_manager);
     /*创建组件*/
-    PF_WidgetFactory w_factory(this,a_map,ag_manager);
+    PF_WidgetFactory  w_factory(this,a_map,ag_manager);
     w_factory.createRibbon();
     w_factory.createMenuFile();
     ribbonBar()->setFrameThemeEnabled();//不显示一条白带

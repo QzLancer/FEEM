@@ -310,7 +310,7 @@ protected:
     bool mOpenGl;
 
     // non-property members:
-    QList<QSharedPointer<QCPAbstractPaintBuffer> > mPaintBuffers;
+    QList<QSharedPointer<QCPAbstractPaintBuffer> >  mPaintBuffers;
     QPoint mMousePressPos;
     bool mMouseHasMoved;
     QPointer<QCPLayerable> mMouseEventLayerable;

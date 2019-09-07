@@ -34,7 +34,7 @@ void PF_EventHandler::mousePressEvent(QMouseEvent *e)
             e->ignore();
         }
     }
-    //qDebug()<<"PF_EventHandler::mousePressEvent: OK.";
+    qDebug()<<"PF_EventHandler::mousePressEvent: OK.";
 }
 
 void PF_EventHandler::mouseReleaseEvent(QMouseEvent *e)
@@ -59,8 +59,9 @@ void PF_EventHandler::mouseReleaseEvent(QMouseEvent *e)
 void PF_EventHandler::mouseMoveEvent(QMouseEvent *e)
 {
     //qDebug()<<Q_FUNC_INFO;
-    if(hasAction())
+    if(hasAction()){
         currentAction.last()->mouseMoveEvent(e);
+    }
     else if(defaultAction)
         defaultAction->mouseMoveEvent(e);
     //qDebug()<<"PF_EventHandler::mouseMoveEvent: OK.";

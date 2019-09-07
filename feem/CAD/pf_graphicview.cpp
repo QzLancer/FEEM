@@ -444,6 +444,7 @@ PF_EntityContainer *PF_GraphicView::getOverlayContainer(PF::OverlayGraphics posi
 
 void PF_GraphicView::back()
 {
+
     if(eventHandler && eventHandler->hasAction()){
         eventHandler->back();
     }
@@ -2745,6 +2746,7 @@ void PF_GraphicView::mousePressEvent(QMouseEvent *event)
         //zoom action
     }
     eventHandler->mousePressEvent(event);
+    qDebug()<<"PF_GraphicView::mousePressEvent: OK.";
 }
 
 /*! \internal

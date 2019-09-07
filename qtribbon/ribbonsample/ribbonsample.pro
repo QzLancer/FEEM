@@ -24,6 +24,7 @@ HEADERS       = mainwindow.h
 SOURCES       = main.cpp \
                 mainwindow.cpp
 
+
 RESOURCES     = ribbonsample.qrc
 FORMS         = ribbonsample.ui
 
