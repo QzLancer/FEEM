@@ -1,33 +1,33 @@
 #ifndef BOUNCEWIDGET_H
 #define BOUNCEWIDGET_H
 
-#include <QMainWindow>
+#include <QDialog>
 #include <QWidget>
 #include <QTabWidget>
 #include "bouncetab.h"
 #include <QPushButton>
 
-class BounceWidget : public QMainWindow
+class BounceDialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit BounceWidget(QWidget *parent = nullptr);
+    explicit BounceDialog(QWidget *parent = nullptr);
+    ~BounceDialog();
 
 signals:
 
 public slots:
-
+    void Run();
 private:
+    void initialization();
     void addMaterialPropertiesTab();
     void addSpringReactionForceTab();
     void addCollisionContactTab();
     void addSolvePropertiesTab();
 
-    void setCentralWidgetProperties();
-
     QTabWidget *mTabWidget;
-    QWidget *mCentralWidget;
     QPushButton *mRunButton;
+    QPushButton *mCancelButton;
 };
 
 #endif // BOUNCEWIDGET_H

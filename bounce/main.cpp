@@ -2,7 +2,7 @@
 #include <QApplication>
 #include <qcustomplot.h>
 #include <QDebug>
-#include "bouncewidget.h"
+#include "bouncedialog.h"
 
 int main(int argc, char *argv[])
 {
@@ -13,8 +13,8 @@ int main(int argc, char *argv[])
 //    core.Init("D:/FEEM/bounce/cosim3D_force.xlsx");
 //    core.bounceCalculate(0, 0.08);
 
-    BounceWidget bw;
-    bw.show();
+    BounceDialog bd;
+    bd.show();
 
 //    BounceTab bt;
 //    bt.addLine("test1");

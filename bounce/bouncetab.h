@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QString>
+#include <QFormLayout>
 
 class BounceTab : public QWidget
 {
@@ -18,6 +19,7 @@ public slots:
 
 private:
     QVBoxLayout mVLayout;
+    QFormLayout mFLayout;
 };
 
 #endif // BOUNCETAB_H

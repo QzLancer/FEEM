@@ -30,14 +30,14 @@ SOURCES += \
         main.cpp \
     bouncecore.cpp \
     qcustomplot.cpp \
-    bouncewidget.cpp \
-    bouncetab.cpp
+    bouncetab.cpp \
+    bouncedialog.cpp
 
 HEADERS += \
     bouncecore.h \
     qcustomplot.h \
-    bouncewidget.h \
-    bouncetab.h
+    bouncetab.h \
+    bouncedialog.h
 
 QT += axcontainer
 
