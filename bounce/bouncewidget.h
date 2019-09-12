@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <QTabWidget>
 #include "bouncetab.h"
+#include <QPushButton>
 
 class BounceWidget : public QMainWindow
 {
@@ -18,11 +19,15 @@ public slots:
 
 private:
     void addMaterialPropertiesTab();
-    void addSpringForceTab();
-    QTabWidget *mTabWidget;
-    QWidget *mInputDynamicCurve;
-    QWidget *mMaterialPropoties;
+    void addSpringReactionForceTab();
+    void addCollisionContactTab();
+    void addSolvePropertiesTab();
 
+    void setCentralWidgetProperties();
+
+    QTabWidget *mTabWidget;
+    QWidget *mCentralWidget;
+    QPushButton *mRunButton;
 };
 
 #endif // BOUNCEWIDGET_H
