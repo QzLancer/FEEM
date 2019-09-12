@@ -29,11 +29,15 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
     bouncecore.cpp \
-    qcustomplot.cpp
+    qcustomplot.cpp \
+    bouncewidget.cpp \
+    bouncetab.cpp
 
 HEADERS += \
     bouncecore.h \
-    qcustomplot.h
+    qcustomplot.h \
+    bouncewidget.h \
+    bouncetab.h
 
 QT += axcontainer
 
