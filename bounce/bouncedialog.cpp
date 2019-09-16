@@ -3,17 +3,20 @@
 #include "bouncecore.h"
 #include <QDebug>
 #include "qcustomplot.h"
+#include <QPalette>
 
 BounceDialog::BounceDialog(QWidget *parent) : QDialog(parent),
     mTabWidget(new QTabWidget(this)),
     mRunButton(new QPushButton(tr("Run"), this)),
-    mCancelButton(new QPushButton(tr("Cancel"), this))
+    mCancelButton(new QPushButton(tr("Cancel"), this)),
+    mWarningLabel(new QLabel(this))
 {    
     initialization();
 }
 
 BounceDialog::~BounceDialog()
 {
+    delete mWarningLabel;
     delete mCancelButton;
     delete mRunButton;
     delete mTabWidget;
@@ -22,7 +25,8 @@ BounceDialog::~BounceDialog()
 void BounceDialog::Run()
 {
 //    qDebug() << "BounceDialog::Run() OK!";
-    bool hasEmptyLine = 0;
+    bool isError = 0;
+
     if(mLineEditMap.isEmpty()){
         qDebug() << "mLineEditMap is Empty!!";
     }
@@ -30,18 +34,30 @@ void BounceDialog::Run()
     for(auto iter = mLineEditMap.begin(); iter != mLineEditMap.end(); ++iter){
         QString stylesheet = iter.value()->styleSheet();
         if(iter.value()->text().isEmpty()){
-            hasEmptyLine = 1;
-            iter.value()->setStyleSheet("border:1px solid red;");
+            isError = 1;
+//            iter.value()->setStyleSheet("border:1px solid red;");
+            mWarningLabel->setText(tr("Error: Some properties are empty!"));
         }else{
             iter.value()->setStyleSheet("");
         }
     }
 
-    if(hasEmptyLine == 0){
+    if(isError == 0){
+        mWarningLabel->setText(tr(""));
+        bool isdouble;
+        double data;
         for(auto iter = mLineEditMap.begin(); iter != mLineEditMap.end(); ++iter){
-            mData.insert(iter.key(), iter.value()->text().toDouble());
+            data = iter.value()->text().toDouble(&isdouble);
+            if(isdouble){
+                mData.insert(iter.key(), data);
+            }else{
+                mWarningLabel->setText(tr("Error: Properties must be number!"));
+                isError = 1;
+            }
         }
+    }
 
+    if(isError == 0){
         BounceCore core;
         core.Init("D:/FEEM/bounce/cosim3D_force.xlsx");
 //        core.initMaterialProperties(mData[tr("Open distance: ")], mData[tr("Stroke: ")], mData[tr("Moving contact mass: ")], mData[tr("Armature mass: ")]);
@@ -56,12 +72,15 @@ void BounceDialog::Run()
 
         close();
     }
-
 }
 
 void BounceDialog::initialization()
 {
     setWindowTitle(tr("Bounce calculate"));
+
+    QPalette pe;
+    pe.setColor(QPalette::WindowText, Qt::red);
+    mWarningLabel->setPalette(pe);
 
     addMaterialPropertiesTab();
     addSpringReactionForceTab();
@@ -75,6 +94,7 @@ void BounceDialog::initialization()
 
     QVBoxLayout *vlayout = new QVBoxLayout(this);
     vlayout->addWidget(mTabWidget);
+    vlayout->addWidget(mWarningLabel);
     vlayout->addLayout(hlayout);
 
     connect(mCancelButton, &QPushButton::clicked, [this]{this->reject();});

@@ -9,6 +9,7 @@
 #include <QString>
 #include <QLineEdit>
 #include <QMap>
+#include <QLabel>
 
 class BounceDialog : public QDialog
 {
@@ -34,6 +35,7 @@ private:
     QPushButton *mRunButton;
     QPushButton *mCancelButton;
     QMap<QString, double> mData;
+    QLabel *mWarningLabel;
 
 //    QObjectList *mLineEditList;
 
