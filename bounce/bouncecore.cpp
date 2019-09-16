@@ -48,6 +48,10 @@ void BounceCore::initMaterialProperties(double open_distance, double stroke, dou
     D_xc = stroke;
     M_d = mov_contact_mass;
     M_x = armatrue_mass;
+    qDebug() << "D_kj = " << D_kj;
+    qDebug() << "D_xc = " << D_xc;
+    qDebug() << "M_d = " << M_d;
+    qDebug() << "M_x = " << M_x;
 }
 
 void BounceCore::initSpringReactionForce(double overtravel_spring_stiffness, double return_spring_stiffness, double overtravel_spring_preload, double return_spring_preload)
@@ -56,6 +60,10 @@ void BounceCore::initSpringReactionForce(double overtravel_spring_stiffness, dou
     K_f = return_spring_stiffness;
     f20 = overtravel_spring_preload;
     f10 = return_spring_preload;
+    qDebug() << "K_c = " << K_c;
+    qDebug() << "K_f = " << K_f;
+    qDebug() << "f20 = " << f20;
+    qDebug() << "f10 = " << f10;
 }
 
 void BounceCore::initCollisionContact(double stiffness, double depth, double damping, double index)
@@ -64,6 +72,10 @@ void BounceCore::initCollisionContact(double stiffness, double depth, double dam
     D_p = depth;
     Da_p = damping;
     e = index;
+    qDebug() << "K_p = " << K_p;
+    qDebug() << "D_p = " << D_p;
+    qDebug() << "Da_p = " << Da_p;
+    qDebug() << "e = " << e;
 }
 
 void BounceCore::initSolveProperties(double initial_time, double end_time, double step_size)
@@ -71,6 +83,9 @@ void BounceCore::initSolveProperties(double initial_time, double end_time, doubl
     t0 = initial_time;
     tn = end_time;
     dt = step_size;
+    qDebug() << "t0 = " << t0;
+    qDebug() << "tn = " << tn;
+    qDebug() << "dt = " << dt;
 }
 
 /*!

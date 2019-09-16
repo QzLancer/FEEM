@@ -58,12 +58,15 @@ void BounceDialog::Run()
     }
 
     if(isError == 0){
+//        for(auto iter = mData.begin(); iter != mData.end(); ++iter){
+//            qDebug() << iter.key() << iter.value();
+//        }
         BounceCore core;
         core.Init("D:/FEEM/bounce/cosim3D_force.xlsx");
-//        core.initMaterialProperties(mData[tr("Open distance: ")], mData[tr("Stroke: ")], mData[tr("Moving contact mass: ")], mData[tr("Armature mass: ")]);
-//        core.initSpringReactionForce(mData[tr("Stiffness of overtravel spring: ")], mData[tr("Stiffness of return spring: ")], mData[tr("Pre-pressure of overtravel spring: ")], mData[tr("Pre-pressure of return spring: ")]);
-//        core.initCollisionContact(mData[tr("Stiffness: ")], mData[tr("Depth: ")], mData[tr("Damping: ")], mData[tr("Index: ")]);
-//        core.initSolveProperties(mData[tr("Initial time: ")], mData[tr("End time: ")], mData[tr("Step size: ")]);
+        core.initMaterialProperties(mData[tr("Open distance: ")], mData[tr("Stroke: ")], mData[tr("Moving contact mass: ")], mData[tr("Armature mass: ")]);
+        core.initSpringReactionForce(mData[tr("Stiffness of overtravel spring: ")], mData[tr("Stiffness of return spring: ")], mData[tr("Pre-pressure of overtravel spring: ")], mData[tr("Pre-pressure of return spring: ")]);
+        core.initCollisionContact(mData[tr("Stiffness: ")], mData[tr("Depth: ")], mData[tr("Damping: ")], mData[tr("Index: ")]);
+        core.initSolveProperties(mData[tr("Initial time: ")], mData[tr("End time: ")], mData[tr("Step size: ")]);
         core.bounceCalculate();
 
         QCustomPlot *cp = new QCustomPlot;
@@ -116,7 +119,7 @@ void BounceDialog::addSpringReactionForceTab()
     BounceTab *springreactionforcetab = new BounceTab(this);
     springreactionforcetab->addLine(tr("Stiffness of overtravel spring: "));
     springreactionforcetab->addLine(tr("Stiffness of return spring: "));
-    springreactionforcetab->addLine(tr("Pre-pressure of overtralve spring: "));
+    springreactionforcetab->addLine(tr("Pre-pressure of overtravel spring: "));
     springreactionforcetab->addLine(tr("Pre-pressure of return spring: "));
     mTabWidget->addTab(springreactionforcetab, tr("Spring reaction force"));
 }
