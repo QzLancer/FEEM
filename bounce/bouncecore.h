@@ -1,4 +1,4 @@
-#ifndef BOUNCECAL_H
+   #ifndef BOUNCECAL_H
 #define BOUNCECAL_H
 
 /*
@@ -10,6 +10,7 @@
 #include <QWidget>
 #include <QString>
 #include <QList>
+#include <QMap>
 
 class QCustomPlot;
 class BounceCore : public QObject
@@ -20,8 +21,12 @@ public:
     BounceCore();
     BounceCore(QString fileName);
 	~BounceCore();
-	void Init(QString fileName);
-	void bounceCalculate(double t0, double tn);
+    void Init(QString fileName);
+    void initMaterialProperties(double open_distance, double stroke, double mov_contact_mass, double armatrue_mass);
+    void initSpringReactionForce(double overtravel_spring_stiffness, double return_spring_stiffness, double overtravel_spring_preload, double return_spring_preload);
+    void initCollisionContact(double stiffness, double depth, double damping, double index);
+    void initSolveProperties(double initial_time, double end_time, double step_size);
+    void bounceCalculate();
     void plot(QCustomPlot *widget);
 
 private:
@@ -44,6 +49,8 @@ private:
 	double f10;     //返回弹簧预压力/N
 	double f20;     //超程弹簧预压力/N
 	double e;       //碰撞指数
+    double t0;      //起始时间
+    double tn;      //结束时间
     QVector<double> t;
     QVector<double> xd;
     QVector<double> xx;

@@ -6,6 +6,9 @@
 #include <QTabWidget>
 #include "bouncetab.h"
 #include <QPushButton>
+#include <QString>
+#include <QLineEdit>
+#include <QMap>
 
 class BounceDialog : public QDialog
 {
@@ -13,11 +16,13 @@ class BounceDialog : public QDialog
 public:
     explicit BounceDialog(QWidget *parent = nullptr);
     ~BounceDialog();
+    QMap<QString, QLineEdit*> mLineEditMap;
 
 signals:
 
 public slots:
     void Run();
+
 private:
     void initialization();
     void addMaterialPropertiesTab();
@@ -28,6 +33,20 @@ private:
     QTabWidget *mTabWidget;
     QPushButton *mRunButton;
     QPushButton *mCancelButton;
+    QMap<QString, double> mData;
+
+//    QObjectList *mLineEditList;
+
+//    QLineEdit *mOpenDistanceEdit;
+//    QLineEdit *mStrokeEdit;
+//    QLineEdit *mMovingContactMassEdit;
+//    QLineEdit *mQualityMass;
+
+//    QLineEdit *mStiffofOutofRangeSpring;
+//    QLineEdit *mStiffofReturnSpring;
+//    QLineEdit *mPrePressofOutofRangeSpring;
+//    QLineEdit *mPrePressofReturnSpring;
+
 };
 
 #endif // BOUNCEWIDGET_H

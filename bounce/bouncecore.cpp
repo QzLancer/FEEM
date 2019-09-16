@@ -23,19 +23,54 @@ BounceCore::~BounceCore()
 void BounceCore::Init(QString fileName)
 {
 	Ef_t = readExcel(fileName);
-	dt = 0.00001;
-	D_kj = 0.0017;
-	D_xc = 0.00268;
-	K_c = 13000;
-	K_f = 370;
-	M_d = 0.007;
-	M_x = 0.0129;
-	K_p = 5.3E+8;
-	D_p = 0.0001;
-	Da_p = 1000;
-	f10 = 6;
-	f20 = 7;
-	e = 1.5;
+    dt = 0.00001;
+    D_kj = 0.0017;
+    D_xc = 0.00268;
+    K_c = 13000;
+    K_f = 370;
+    M_d = 0.007;
+    M_x = 0.0129;
+    K_p = 5.3E+8;
+    D_p = 0.0001;
+    Da_p = 1000;
+    f10 = 6;
+    f20 = 7;
+    e = 1.5;
+    t0 = 0;
+    tn = 0.08;
+
+
+}
+
+void BounceCore::initMaterialProperties(double open_distance, double stroke, double mov_contact_mass, double armatrue_mass)
+{
+    D_kj = open_distance;
+    D_xc = stroke;
+    M_d = mov_contact_mass;
+    M_x = armatrue_mass;
+}
+
+void BounceCore::initSpringReactionForce(double overtravel_spring_stiffness, double return_spring_stiffness, double overtravel_spring_preload, double return_spring_preload)
+{
+    K_c = overtravel_spring_stiffness;
+    K_f = return_spring_stiffness;
+    f20 = overtravel_spring_preload;
+    f10 = return_spring_preload;
+}
+
+void BounceCore::initCollisionContact(double stiffness, double depth, double damping, double index)
+{
+    K_p = stiffness;
+    D_p = depth;
+    Da_p = damping;
+    e = index;
+}
+
+void BounceCore::initSolveProperties(double initial_time, double end_time, double step_size)
+{
+    t0 = initial_time;
+    tn = end_time;
+    dt = step_size;
 }
 
 /*!
@@ -43,7 +78,7 @@ void BounceCore::Init(QString fileName)
  *  @param t0 : 仿真开始时间
  *  @param t1 : 仿真结束时间
  */
-void BounceCore::bounceCalculate(double t0, double tn)
+void BounceCore::bounceCalculate()
 {
 	QList<double>Ef = Ef_t[1];  //电磁力向量
 	const unsigned int n = static_cast<unsigned int>((tn - t0) / dt);
@@ -54,7 +89,7 @@ void BounceCore::bounceCalculate(double t0, double tn)
 	double *vd = new double[n];
 	double *vx = new double[n];
 	for (int i = 0; i < n; ++i) {
-        t[i] = 0;
+        t[i] = t0;
         xd[i] = 0;
         xx[i] = 0;
 		vd[i] = 0;

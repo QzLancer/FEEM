@@ -1,12 +1,15 @@
 #include "bouncedialog.h"
 #include <QVBoxLayout>
+#include "bouncecore.h"
+#include <QDebug>
+#include "qcustomplot.h"
+
 BounceDialog::BounceDialog(QWidget *parent) : QDialog(parent),
     mTabWidget(new QTabWidget(this)),
     mRunButton(new QPushButton(tr("Run"), this)),
     mCancelButton(new QPushButton(tr("Cancel"), this))
 {    
     initialization();
-
 }
 
 BounceDialog::~BounceDialog()
@@ -18,6 +21,41 @@ BounceDialog::~BounceDialog()
 
 void BounceDialog::Run()
 {
+//    qDebug() << "BounceDialog::Run() OK!";
+    bool hasEmptyLine = 0;
+    if(mLineEditMap.isEmpty()){
+        qDebug() << "mLineEditMap is Empty!!";
+    }
+
+    for(auto iter = mLineEditMap.begin(); iter != mLineEditMap.end(); ++iter){
+        QString stylesheet = iter.value()->styleSheet();
+        if(iter.value()->text().isEmpty()){
+            hasEmptyLine = 1;
+            iter.value()->setStyleSheet("border:1px solid red;");
+        }else{
+            iter.value()->setStyleSheet("");
+        }
+    }
+
+    if(hasEmptyLine == 0){
+        for(auto iter = mLineEditMap.begin(); iter != mLineEditMap.end(); ++iter){
+            mData.insert(iter.key(), iter.value()->text().toDouble());
+        }
+
+        BounceCore core;
+        core.Init("D:/FEEM/bounce/cosim3D_force.xlsx");
+//        core.initMaterialProperties(mData[tr("Open distance: ")], mData[tr("Stroke: ")], mData[tr("Moving contact mass: ")], mData[tr("Armature mass: ")]);
+//        core.initSpringReactionForce(mData[tr("Stiffness of overtravel spring: ")], mData[tr("Stiffness of return spring: ")], mData[tr("Pre-pressure of overtravel spring: ")], mData[tr("Pre-pressure of return spring: ")]);
+//        core.initCollisionContact(mData[tr("Stiffness: ")], mData[tr("Depth: ")], mData[tr("Damping: ")], mData[tr("Index: ")]);
+//        core.initSolveProperties(mData[tr("Initial time: ")], mData[tr("End time: ")], mData[tr("Step size: ")]);
+        core.bounceCalculate();
+
+        QCustomPlot *cp = new QCustomPlot;
+        cp->show();
+        core.plot(cp);
+
+        close();
+    }
 
 }
 
@@ -39,7 +77,7 @@ void BounceDialog::initialization()
     vlayout->addWidget(mTabWidget);
     vlayout->addLayout(hlayout);
 
-    connect(mCancelButton, &QPushButton::clicked, [this]{this->close();});
+    connect(mCancelButton, &QPushButton::clicked, [this]{this->reject();});
     connect(mRunButton, &QPushButton::clicked, this, &BounceDialog::Run);
 }
 
@@ -49,16 +87,16 @@ void BounceDialog::addMaterialPropertiesTab()
     materialpropertiestab->addLine(tr("Open distance: "));
     materialpropertiestab->addLine(tr("Stroke: "));
     materialpropertiestab->addLine(tr("Moving contact mass: "));
-    materialpropertiestab->addLine(tr("Quality mass: "));
+    materialpropertiestab->addLine(tr("Armature mass: "));
     mTabWidget->addTab(materialpropertiestab, tr("Material properties"));
 }
 
 void BounceDialog::addSpringReactionForceTab()
 {
     BounceTab *springreactionforcetab = new BounceTab(this);
-    springreactionforcetab->addLine(tr("Stiffness of out-of-range spring: "));
+    springreactionforcetab->addLine(tr("Stiffness of overtravel spring: "));
     springreactionforcetab->addLine(tr("Stiffness of return spring: "));
-    springreactionforcetab->addLine(tr("Pre-pressure of out-of-range spring: "));
+    springreactionforcetab->addLine(tr("Pre-pressure of overtralve spring: "));
     springreactionforcetab->addLine(tr("Pre-pressure of return spring: "));
     mTabWidget->addTab(springreactionforcetab, tr("Spring reaction force"));
 }

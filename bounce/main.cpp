@@ -3,15 +3,24 @@
 #include <qcustomplot.h>
 #include <QDebug>
 #include "bouncedialog.h"
+#include <QTranslator>
 
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
 
+    QTranslator translator;
+    translator.load("zh_CN");
+    a.installTranslator(&translator);
+
 //    BounceCore core;
 //    qDebug() << QDir::currentPath();
 //    core.Init("D:/FEEM/bounce/cosim3D_force.xlsx");
 //    core.bounceCalculate(0, 0.08);
+
+//    QCustomPlot cp;
+//    cp.show();
+//    core.plot(&cp);
 
     BounceDialog bd;
     bd.show();
