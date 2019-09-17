@@ -199,6 +199,6 @@ SOURCES += \
 
 include($$PWD/../qtribbon/ribbonsample/shared/aboutdialog.pri)
 include($$PWD/../qtribbon/ribbonsample/shared/ribbonwindow.pri)
-
+include($$PWD/../bounce/bounce.pri)
 DISTFILES += \
     res/icon.rc
