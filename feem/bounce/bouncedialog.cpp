@@ -2,7 +2,7 @@
 #include <QVBoxLayout>
 #include "bouncecore.h"
 #include <QDebug>
-#include "qcustomplot.h"
+//#include "qcustomplot.h"
 #include <QPalette>
 
 BounceDialog::BounceDialog(QWidget *parent) : QDialog(parent),
@@ -69,9 +69,9 @@ void BounceDialog::Run()
         core.initSolveProperties(mData[tr("Initial time: ")], mData[tr("End time: ")], mData[tr("Step size: ")]);
         core.bounceCalculate();
 
-        QCustomPlot *cp = new QCustomPlot;
-        cp->show();
-        core.plot(cp);
+//        QCustomPlot *cp = new QCustomPlot;
+//        cp->show();
+//        core.plot(cp);
 
         close();
     }
@@ -95,8 +95,7 @@ void BounceDialog::initialization()
     hlayout->addWidget(mRunButton);
     hlayout->addWidget(mCancelButton);
 
-    QVBoxLayout *vlayout = new QVBoxLayout(/*this*/);
-    setLayout(vlayout);
+    QVBoxLayout *vlayout = new QVBoxLayout(this);
     vlayout->addWidget(mTabWidget);
     vlayout->addWidget(mWarningLabel);
     vlayout->addLayout(hlayout);
@@ -143,5 +142,3 @@ void BounceDialog::addSolvePropertiesTab()
     solvepropertiestab->addLine(tr("Step size: "));
     mTabWidget->addTab(solvepropertiestab, tr("Solve properties"));
 }
-
-

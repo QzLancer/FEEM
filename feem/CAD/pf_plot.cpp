@@ -1028,6 +1028,7 @@ QCPLayer::QCPLayer(PF_GraphicView *parentPlot, const QString &layerName) :
     // management is done with PF_GraphicView functions.
 }
 
+
 QCPLayer::~QCPLayer()
 {
     // If child layerables are still on this layer, detach them, so they don't try to reach back to this
@@ -18926,7 +18927,6 @@ QBrush QCPItemEllipse::mainBrush() const
     return mSelected ? mSelectedBrush : mBrush;
 }
 /* end of 'src/items/item-ellipse.cpp' */
-
 
 
 

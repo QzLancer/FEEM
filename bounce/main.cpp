@@ -4,6 +4,7 @@
 #include <QDebug>
 #include "bouncedialog.h"
 #include <QTranslator>
+#include <QWidget>
 
 int main(int argc, char *argv[])
 {
@@ -30,7 +31,8 @@ int main(int argc, char *argv[])
 //    bt.addLine("test2");
 //    bt.show();
 
-
+//    QWidget *w = new QWidget;
+//    w->show();
 
 
 	return a.exec();

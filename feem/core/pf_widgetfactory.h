@@ -60,6 +60,7 @@ public:
     void createGroupClearSolution(Qtitan::RibbonPage* page);
     //results
     void createGroupPlot(Qtitan::RibbonPage* page);
+    void createGroupOptimize(Qtitan::RibbonPage* page);
     //
     QMenu* file_menu;/**留出接口，添加recentfile**/
 

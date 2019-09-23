@@ -53,6 +53,7 @@
         <file>zoomin.png</file>
         <file>zoomout.png</file>
         <file>zoomselected.png</file>
+        <file>bounce32x32.png</file>
     </qresource>
     <qresource prefix="/">
         <file>translations/feem_zh.qm</file>

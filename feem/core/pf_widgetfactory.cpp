@@ -170,12 +170,9 @@ void PF_WidgetFactory::createRibbon()
     if (Qtitan::RibbonPage* pageResults = mainwindow->ribbonBar()->addPage(tr("&Results")))
     {
         createGroupPlot(pageResults);
+        createGroupOptimize(pageResults);
     }
 
-    if (Qtitan::RibbonPage* pageTest = mainwindow->ribbonBar()->addPage(tr("&test")))
-    {
-        createGroupDraw(pageTest);
-    }
 }
 
 void PF_WidgetFactory::createStatusBar()
@@ -448,5 +445,13 @@ void PF_WidgetFactory::createGroupPlot(RibbonPage *page)
     if(Qtitan::RibbonGroup* groupPlot = page->addGroup(QIcon(":/main/project.png"), tr("Plot")))
     {
 
+    }
+}
+
+void PF_WidgetFactory::createGroupOptimize(RibbonPage *page)
+{
+    if(Qtitan::RibbonGroup* groupOptimize = page->addGroup(QIcon(":/main/project.png"), tr("Optimize")))
+    {
+        groupOptimize->addAction(a_map["BounceCalculate"], Qt::ToolButtonTextUnderIcon);
     }
 }

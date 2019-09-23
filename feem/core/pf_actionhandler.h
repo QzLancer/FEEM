@@ -79,6 +79,9 @@ public slots:
     void slotShowResult();
     void slotSolveSetting();
 
+    //result
+    void slotBounceCalculate();
+
     //About
     void slotShowAbout();
 private:

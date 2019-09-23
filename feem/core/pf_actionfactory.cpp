@@ -205,6 +205,13 @@ void PF_ActionFactory::fillActionContainer(QMap<QString, QAction*>& a_map, PF_Ac
 	connect(action, SIGNAL(triggered()), action_handler, SLOT(slotSolveSetting()));
 	action->setObjectName("SolveSetting");
 	a_map["SolveSetting"] = action;
+
+    //result
+    action = new QAction(tr("BounceCalculate"), agm->file);
+    connect(action, SIGNAL(triggered()), action_handler, SLOT(slotBounceCalculate()));
+    action->setObjectName("BounceCalculate");
+    action->setIcon(QIcon(":/main/bounce32x32.png"));
+    a_map["BounceCalculate"] = action;
 	
 	//About
 	action = new QAction(tr("ShowAbout"), agm->file);

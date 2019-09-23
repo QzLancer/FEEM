@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2019-09-06T11:01:23
+# Project created by QtCreator 2019-09-18T16:36:41
 #
 #-------------------------------------------------
 
@@ -8,9 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
-
-TARGET = bounce
+TARGET = Optimize
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -27,25 +25,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
-        main.cpp \
-    bouncecore.cpp \
-    qcustomplot.cpp \
-    bouncetab.cpp \
-    bouncedialog.cpp \
+    singleobjectdialog.cpp\
+    main.cpp \
+    multiobjectdialog.cpp
 
 HEADERS += \
-    bouncecore.h \
-    qcustomplot.h \
-    bouncetab.h \
-    bouncedialog.h \
-
-QT += axcontainer
-
-DESTDIR = $$PWD/bin
+    singleobjectdialog.h \
+    multiobjectdialog.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
-
-TRANSLATIONS += zh_CN.ts

@@ -8,6 +8,7 @@
 #include "pf_actionselectsingle.h"
 #include "pf_document.h"
 #include "pf_graphicview.h"
+#include "bounce/bouncedialog.h"
 
 PF_ActionHandler::PF_ActionHandler(QObject *parent) : QObject(parent)
 {
@@ -318,6 +319,12 @@ void PF_ActionHandler::slotShowResult() {
 
 void PF_ActionHandler::slotSolveSetting() {
     setCurrentAction(PF::ActionSolveSetting);
+}
+
+void PF_ActionHandler::slotBounceCalculate()
+{
+    BounceDialog *dialog = new BounceDialog;
+    dialog->show();
 }
 
 void PF_ActionHandler::slotShowAbout() {

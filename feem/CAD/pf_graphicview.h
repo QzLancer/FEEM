@@ -78,6 +78,7 @@ public:
     Q_ENUMS(RefreshPriority)
 
     explicit PF_GraphicView(PF_Document* doc, QWidget *parent = nullptr);
+    explicit PF_GraphicView(QWidget *parent = nullptr);
     ~PF_GraphicView() override;
 
     void drawLayer1(QPainter * painter);

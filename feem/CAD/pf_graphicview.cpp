@@ -263,6 +263,154 @@ PF_GraphicView::PF_GraphicView(PF_Document *doc, QWidget *parent)
     replot(rpQueuedReplot);
 }
 
+PF_GraphicView::PF_GraphicView(QWidget *parent)
+    : QWidget(parent),
+      xAxis(nullptr),
+      yAxis(nullptr),
+      xAxis2(nullptr),
+      yAxis2(nullptr),
+      legend(nullptr),
+      eventHandler(new PF_EventHandler(this)),
+      mBufferDevicePixelRatio(1.0), // will be adapted to primary screen below
+      mPlotLayout(nullptr),
+      mAutoAddPlottableToLegend(true),
+      mAntialiasedElements(QCP::aeNone),
+      mNotAntialiasedElements(QCP::aeNone),
+      mInteractions(nullptr),
+      mSelectionTolerance(8),
+      mNoAntialiasingOnDrag(false),
+      mBackgroundBrush(Qt::white, Qt::SolidPattern),
+      mBackgroundScaled(true),
+      mBackgroundScaledMode(Qt::KeepAspectRatioByExpanding),
+      mCurrentLayer(nullptr),
+      mPlottingHints(QCP::phCacheLabels|QCP::phImmediateRefresh),
+      mMultiSelectModifier(Qt::ControlModifier),
+      mSelectionRectMode(QCP::srmNone),
+      mSelectionRect(nullptr),
+      mOpenGl(false),
+      mMouseHasMoved(false),
+      mMouseEventLayerable(nullptr),
+      mMouseSignalLayerable(nullptr),
+      mReplotting(false),
+      mReplotQueued(false),
+      mOpenGlMultisamples(16),
+      mOpenGlAntialiasedElementsBackup(QCP::aeNone),
+      mOpenGlCacheLabelsBackup(true)
+
+{
+    //qDebug()<<"PF_GraphicView::PF_GraphicView";
+
+    /**鼠标跟踪失效（默认），当鼠标被移动的时候只有在至少一个鼠标按键被按下时，
+    这个窗口部件才会接收鼠标移动事件。**/
+    setMouseTracking(true);
+
+    setDefaultSnapMode(PF_SnapMode());
+
+
+    setAttribute(Qt::WA_NoMousePropagation);
+    setAttribute(Qt::WA_OpaquePaintEvent);
+    setFocusPolicy(Qt::ClickFocus);
+    setMouseTracking(true);
+    QLocale currentLocale = locale();
+    currentLocale.setNumberOptions(QLocale::OmitGroupSeparator);
+    setLocale(currentLocale);
+#ifdef QCP_DEVICEPIXELRATIO_SUPPORTED
+#  ifdef QCP_DEVICEPIXELRATIO_FLOAT
+    setBufferDevicePixelRatio(QWidget::devicePixelRatioF());
+#  else
+    setBufferDevicePixelRatio(QWidget::devicePixelRatio());
+#  endif
+#endif
+
+    mOpenGlAntialiasedElementsBackup = mAntialiasedElements;
+    mOpenGlCacheLabelsBackup = mPlottingHints.testFlag(QCP::phCacheLabels);
+    // create initial layers:
+    mLayers.append(new QCPLayer(this, QLatin1String("background")));
+    mLayers.append(new QCPLayer(this, QLatin1String("grid")));
+    mLayers.append(new QCPLayer(this, QLatin1String("main")));
+    mLayers.append(new QCPLayer(this, QLatin1String("axes")));
+    mLayers.append(new QCPLayer(this, QLatin1String("legend")));
+    mLayers.append(new QCPLayer(this, QLatin1String("overlay")));
+    updateLayerIndices();
+    setCurrentLayer(QLatin1String("main"));
+    layer(QLatin1String("overlay"))->setMode(QCPLayer::lmBuffered);
+
+    // create initial layout, axis rect and legend:
+    mPlotLayout = new QCPLayoutGrid;
+    mPlotLayout->initializeParentPlot(this);
+    mPlotLayout->setParent(this); // important because if parent is QWidget, QCPLayout::sizeConstraintsChanged will call QWidget::updateGeometry
+    mPlotLayout->setLayer(QLatin1String("main"));
+    QCPAxisRect *defaultAxisRect = new QCPAxisRect(this, true);
+    mPlotLayout->addElement(0, 0, defaultAxisRect);
+    xAxis = defaultAxisRect->axis(QCPAxis::atBottom);
+    yAxis = defaultAxisRect->axis(QCPAxis::atLeft);
+    xAxis2 = defaultAxisRect->axis(QCPAxis::atTop);
+    yAxis2 = defaultAxisRect->axis(QCPAxis::atRight);
+    legend = new QCPLegend;
+    legend->setVisible(false);
+    defaultAxisRect->insetLayout()->addElement(legend, Qt::AlignRight|Qt::AlignTop);
+    defaultAxisRect->insetLayout()->setMargins(QMargins(12, 12, 12, 12));
+
+    defaultAxisRect->setLayer(QLatin1String("background"));
+    xAxis->setLayer(QLatin1String("axes"));
+    yAxis->setLayer(QLatin1String("axes"));
+    xAxis2->setLayer(QLatin1String("axes"));
+    xAxis2->setVisible(true);
+    xAxis2->setTickLabels(false);
+    yAxis2->setLayer(QLatin1String("axes"));
+    yAxis2->setVisible(true);
+    yAxis2->setTickLabels(false);
+    xAxis->grid()->setLayer(QLatin1String("grid"));
+    xAxis->grid()->setSubGridVisible(true);
+    xAxis->grid()->setPen(QPen(QColor(205,220,231)));
+    xAxis->grid()->setSubGridPen(QPen(QColor(205,220,231)));
+    yAxis->grid()->setLayer(QLatin1String("grid"));
+    yAxis->grid()->setSubGridVisible(true);
+    yAxis->grid()->setPen(QPen(QColor(205,220,231)));
+    yAxis->grid()->setSubGridPen(QPen(QColor(205,220,231)));
+    xAxis2->grid()->setLayer(QLatin1String("grid"));
+    yAxis2->grid()->setLayer(QLatin1String("grid"));
+    legend->setLayer(QLatin1String("legend"));
+    /**将container添加到main层，这样才能够进行绘制**/
+    container->setLayer(QLatin1String("main"));
+    /**设置坐标轴背景**/
+    defaultAxisRect->setBackground(QBrush(QColor(248,253,255)));
+    /**设置xy轴等比例**/
+    //xAxis->setScaleRatio(yAxis,1);/**该函数在构造函数内无效**/
+    /**设置top轴和right轴随着其他两个轴变化**/
+    connect(defaultAxisRect->axis(QCPAxis::atLeft), SIGNAL(rangeChanged(QCPRange)), defaultAxisRect->axis(QCPAxis::atRight), SLOT(setRange(QCPRange)));
+    connect(defaultAxisRect->axis(QCPAxis::atRight), SIGNAL(rangeChanged(QCPRange)), defaultAxisRect->axis(QCPAxis::atLeft), SLOT(setRange(QCPRange)));
+    connect(defaultAxisRect->axis(QCPAxis::atBottom), SIGNAL(rangeChanged(QCPRange)), defaultAxisRect->axis(QCPAxis::atTop), SLOT(setRange(QCPRange)));
+    connect(defaultAxisRect->axis(QCPAxis::atTop), SIGNAL(rangeChanged(QCPRange)), defaultAxisRect->axis(QCPAxis::atBottom), SLOT(setRange(QCPRange)));
+    /**设置坐标轴可缩放**/
+    setInteractions( QCP::iRangeZoom);
+    /**设置坐标轴上tick的长度长一点**/
+    int subTickLength = 7;
+    int tickLength = 10;
+    xAxis->setTickLength(tickLength,0);
+    xAxis->setSubTickLength(subTickLength,0);
+    xAxis->setSubTickPen(QPen(QColor(128,128,128)));
+    yAxis->setTickLength(tickLength,0);
+    yAxis->setSubTickLength(subTickLength,0);
+    yAxis->setSubTickPen(QPen(QColor(128,128,128)));
+    xAxis2->setTickLength(tickLength,0);
+    xAxis2->setSubTickLength(subTickLength,0);
+    xAxis2->setSubTickPen(QPen(QColor(128,128,128)));
+    yAxis2->setTickLength(tickLength,0);
+    yAxis2->setSubTickLength(subTickLength,0);
+    yAxis2->setSubTickPen(QPen(QColor(128,128,128)));
+    /**设置tickLabel字体**/
+    xAxis->setTickLabelFont(QFont(QLatin1String("sans serif"), 10));
+    yAxis->setTickLabelFont(QFont(QLatin1String("sans serif"), 10));
+    // create selection rect instance:
+    mSelectionRect = new QCPSelectionRect(this);
+    mSelectionRect->setLayer(QLatin1String("overlay"));
+
+    setViewport(rect()); // needs to be called after mPlotLayout has been created
+
+    replot(rpQueuedReplot);
+}
+
 PF_GraphicView::~PF_GraphicView()
 {
     //clearPlottables();
