@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
     QStringList InputList;
     QStringList TargetList;
     InputList << "Input1" << "Input2" << "Input3";
-    TargetList << "Target1" << "Target2" << "Target3";
+    TargetList << "Target1" << "Target2" << "Target3" << "Target4";
     w.setInputList(InputList);
     w.setTargetList(TargetList);
 //    MultiObjectDialog m;

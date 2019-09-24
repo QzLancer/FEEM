@@ -27,11 +27,15 @@ CONFIG += c++11
 SOURCES += \
     singleobjectdialog.cpp\
     main.cpp \
-    multiobjectdialog.cpp
+    multiobjectdialog.cpp \
+    lineedit.cpp \
+    singleobjectcore/singleobjectcore.cpp
 
 HEADERS += \
     singleobjectdialog.h \
-    multiobjectdialog.h
+    multiobjectdialog.h \
+    lineedit.h \
+    singleobjectcore/singleobjectcore.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
