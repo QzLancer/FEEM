@@ -155,7 +155,49 @@ void SingleObjectDialog::slotChangeData(const QModelIndex &topleft, const QModel
 void SingleObjectDialog::slotOptimize()
 {
     if(isParamError()){
-        qDebug() << "Input parameter is OK!";
+        qDebug() << "Input parameter OK!";
+        //将input parameter转换成可以传递的形式
+        double *lower = new double[static_cast<unsigned long long>(mInputValue.size())];
+        double *upper = new double[static_cast<unsigned long long>(mInputValue.size())];
+        double *vmax = new double[static_cast<unsigned long long>(mInputValue.size())]; //粒子最大速度
+        for(int i = 0; i < mInputValue.size(); ++i){
+            lower[i] = mInputValue[i][0];
+            upper[i] = mInputValue[i][1];
+            vmax[i] = 0.1;
+        }
+        //读取各个lineedit中的数据，目前变异概率不使用
+        int numberOfParticles = mSizeEdit->text().toInt();
+        int numberOfVariables = mInputValue.size();
+        int maxIteration = mTimeEdit->text().toInt();
+        double lowerWeight = mWLowerEdit->text().toDouble();
+        double upperWeight = mWUpperEdit->text().toDouble();
+        double c1 = mC1Edit->text().toDouble();
+        double c2 = mC2Edit->text().toDouble();
+        QString stoppingCriteria = "none";
+        QString psoType = "Classic";
+        double threshold = 0.0001;
+
+        //观察输入参数
+        qDebug() << "lower: " << lower[0] << lower[1];
+        qDebug() << "upper: " << upper[0] << upper[1];
+        qDebug() << "vmax: " << vmax[0] << vmax[1];
+        qDebug() << "numberOfParticles: " << numberOfParticles;
+        qDebug() << "numberOfVariables: " << numberOfVariables;
+        qDebug() << "maxIteration: " << maxIteration;
+        qDebug() << "lowerWeight: " << lowerWeight;
+        qDebug() << "upperWeight: " << upperWeight;
+        qDebug() << "c1: " << c1;
+        qDebug() << "c2: " << c2;
+
+        PSO pso(numberOfParticles, numberOfVariables, lower, upper, vmax, SingleObjectDialog::objectiveFunction, lowerWeight, upperWeight, maxIteration, c1, c2, threshold, stoppingCriteria, psoType);
+
+        pso.optimize();
+
+        pso.printBest();
+
+        delete[] vmax;
+        delete[] upper;
+        delete[] lower;
     }
 }
 
@@ -321,8 +363,8 @@ bool SingleObjectDialog::isParamError()
         return false;
     }
 
-    bool isSizeDouble, isTimeInt, isRateDouble, isWUpperDouble, isWLowerDouble, isC1Double, isC2Double;
-    mSizeEdit->text().toDouble(&isSizeDouble);
+    bool isSizeInt, isTimeInt, isRateDouble, isWUpperDouble, isWLowerDouble, isC1Double, isC2Double;
+    mSizeEdit->text().toInt(&isSizeInt);
     mTimeEdit->text().toInt(&isTimeInt);
     mRateEdit->text().toDouble(&isRateDouble);
     mWUpperEdit->text().toDouble(&isWUpperDouble);
@@ -330,7 +372,7 @@ bool SingleObjectDialog::isParamError()
     mC1Edit->text().toDouble(&isC1Double);
     mC2Edit->text().toDouble(&isC2Double);
 
-    if(!isSizeDouble){
+    if(!isSizeInt){
         mWarningLabel1->setText(tr("Error: Number of particles must be a number!"));
         return false;
     }
@@ -359,5 +401,22 @@ bool SingleObjectDialog::isParamError()
         return false;
     }
     return true;
+}
+
+void SingleObjectDialog::objectiveFunction(Particle *Particle)
+{
+    const double *_position = Particle->getPosition ();
+    double _constraits;
+
+    if (Particle::getNumberOfVariables () != 2) {
+        throw "Number of variables in Particles does not match number of variables in objective function" ;
+    }
+
+    Particle->setValue(100 * pow((_position[1] - pow(_position[0], 2)), 2) + pow((1 - _position[0]), 2));
+    _constraits = _position[1] + _position[0] > 1 ? 10000000 * (_position[1] + _position[0] - 1) : 0;
+    //_constraits = 0;
+    Particle->setConstraits(_constraits);
+    Particle->setFeasible(_constraits ? false : true);
+    return;
 }
 

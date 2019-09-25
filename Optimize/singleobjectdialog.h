@@ -65,6 +65,9 @@ private:
     QLineEdit *mC1Edit;
     QLineEdit *mC2Edit;
     QLabel *mWarningLabel1;
+
+    //求解器
+    static void objectiveFunction (Particle *Particle);
 };
 
 #endif // DIALOG_H
