@@ -8,6 +8,7 @@
 #include <QList>
 #include <QItemSelectionModel>
 #include <QLabel>
+#include "singleobjectcore/pso.h"
 
 class SingleObjectDialog : public QDialog
 {
@@ -30,6 +31,7 @@ public:
 public slots:
     void slotAddTableItem(QString item, double minimum, double maximum);
     void slotChangeData(const QModelIndex &topleft, const QModelIndex &bottomRight, const QVector<int> &roles);
+    void slotOptimize();
 
 private:
     QGroupBox *mGroup1;
@@ -37,6 +39,7 @@ private:
     void initializeGroup1();
     void initializeGroup2();
     void refreshTable();
+    bool isParamError();
 
     QStringList mTargetList;
     QStringList mInputList;
@@ -52,6 +55,16 @@ private:
     QList<QList<double>> mInputValue;
 
     QLabel *mWarningLabel;
+
+    //所有的参数输入LineEdit
+    QLineEdit *mSizeEdit;
+    QLineEdit *mTimeEdit;
+    QLineEdit *mRateEdit;
+    QLineEdit *mWUpperEdit;
+    QLineEdit *mWLowerEdit;
+    QLineEdit *mC1Edit;
+    QLineEdit *mC2Edit;
+    QLabel *mWarningLabel1;
 };
 
 #endif // DIALOG_H

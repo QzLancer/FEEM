@@ -16,13 +16,29 @@ SingleObjectDialog::SingleObjectDialog(QWidget *parent)
       mInputBox(new QComboBox(mGroup1)),
       mInputModel(new QStandardItemModel),
       mInputSelection(new QItemSelectionModel(mInputModel)),
-      mWarningLabel(new QLabel(mGroup1))
+      mWarningLabel(new QLabel(mGroup1)),
+      mSizeEdit(new QLineEdit(mGroup2)),
+      mTimeEdit(new QLineEdit(mGroup2)),
+      mRateEdit(new QLineEdit(mGroup2)),
+      mWUpperEdit(new QLineEdit(mGroup2)),
+      mWLowerEdit(new QLineEdit(mGroup2)),
+      mC1Edit(new QLineEdit(mGroup2)),
+      mC2Edit(new QLineEdit(mGroup2)),
+      mWarningLabel1(new QLabel(mGroup2))
 {
     initialize();
 }
 
 SingleObjectDialog::~SingleObjectDialog()
 {
+    delete mWarningLabel1;
+    delete mC2Edit;
+    delete mC1Edit;
+    delete mWLowerEdit;
+    delete mWUpperEdit;
+    delete mRateEdit;
+    delete mTimeEdit;
+    delete mSizeEdit;
     delete mWarningLabel;
     delete mInputSelection;
     delete mInputModel;
@@ -42,15 +58,21 @@ void SingleObjectDialog::initialize()
     hlayout->addWidget(mGroup1);
     hlayout->addWidget(mGroup2);
 
-    QPushButton *buttonadd = new QPushButton(this);
-    buttonadd->setText(tr("To optimize"));
+    QPushButton *buttonoptimize = new QPushButton(this);
+    buttonoptimize->setText(tr("To optimize"));
     QHBoxLayout *hlayout1 = new QHBoxLayout;
+    QPalette pe;
+    pe.setColor(QPalette::WindowText, Qt::red);
+    mWarningLabel1->setPalette(pe);
+    hlayout1->addWidget(mWarningLabel1);
     hlayout1->addStretch();
-    hlayout1->addWidget(buttonadd);
+    hlayout1->addWidget(buttonoptimize);
 
     QVBoxLayout *vlayout = new QVBoxLayout(this);
     vlayout->addLayout(hlayout);
     vlayout->addLayout(hlayout1);
+
+    connect(buttonoptimize, SIGNAL(clicked()), this, SLOT(slotOptimize()));
 }
 
 void SingleObjectDialog::initialize(QStringList inputlist, QStringList targetlist)
@@ -130,6 +152,13 @@ void SingleObjectDialog::slotChangeData(const QModelIndex &topleft, const QModel
     connect(mInputModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(slotChangeData(QModelIndex,QModelIndex,QVector<int>)));
 }
 
+void SingleObjectDialog::slotOptimize()
+{
+    if(isParamError()){
+        qDebug() << "Input parameter is OK!";
+    }
+}
+
 void SingleObjectDialog::initializeGroup1()
 {
     mGroup1->setTitle(tr("Target to be optimized && input parameters"));
@@ -147,9 +176,9 @@ void SingleObjectDialog::initializeGroup1()
     QTableView *inputparamtable = new QTableView(mGroup1);
     QLabel *inputparamlabel1 = new QLabel(tr("Input parameters"), mGroup1);
     QComboBox *inputparambox = mInputBox;
-    QLabel *mininputparamlabel = new QLabel(tr("Minimum of input parameter"), mGroup1);
+    QLabel *mininputparamlabel = new QLabel(tr("Minimum of input parameters: "), mGroup1);
     QLineEdit *mininputparamedit = new QLineEdit(mGroup1);
-    QLabel *maxinputparamlabel = new QLabel(tr("Maximum of input parameter"), mGroup1);
+    QLabel *maxinputparamlabel = new QLabel(tr("Maximum of input parameters: "), mGroup1);
     QLineEdit *maxinputparamedit = new QLineEdit(mGroup1);
     QLabel *warninglabel = mWarningLabel;
     QPalette pe;
@@ -227,32 +256,32 @@ void SingleObjectDialog::initializeGroup2()
     mGroup2->setTitle(tr("Single target PSO parameters"));
 
     //种群大小
-    QLabel *sizelabel = new QLabel(tr("Population size: "), mGroup2);
-    QLineEdit *sizeedit = new QLineEdit(mGroup2);
+    QLabel *sizelabel = new QLabel(tr("Number of Particles: "), mGroup2);
+    QLineEdit *sizeedit = mSizeEdit;
 
     //粒子群循环次数
-    QLabel *timelabel = new QLabel(tr("Time of PSO circles: "), mGroup2);
-    QLineEdit *timeedit = new QLineEdit(mGroup2);
+    QLabel *timelabel = new QLabel(tr("Max iteration: "), mGroup2);
+    QLineEdit *timeedit = mTimeEdit;
 
     //变异概率
     QLabel *ratelabel = new QLabel(tr("Mutation rate: "), mGroup2);
-    QLineEdit *rateedit = new QLineEdit(mGroup2);
+    QLineEdit *rateedit = mRateEdit;
 
     //w上界
-    QLabel *wupperlabel = new QLabel(tr("W upper bound: "), mGroup2);
-    QLineEdit *wupperedit = new QLineEdit(mGroup2);
+    QLabel *wupperlabel = new QLabel(tr("Upper weight: "), mGroup2);
+    QLineEdit *wupperedit = mWUpperEdit;
 
     //w下界
-    QLabel *wlowerlabel = new QLabel(tr("W lower bound: "), mGroup2);
-    QLineEdit *wloweredit = new QLineEdit(mGroup2);
+    QLabel *wlowerlabel = new QLabel(tr("Lower weight: "), mGroup2);
+    QLineEdit *wloweredit = mWLowerEdit;
 
     //c1
     QLabel *c1label = new QLabel(tr("c1: "), mGroup2);
-    QLineEdit *c1edit = new QLineEdit(mGroup2);
+    QLineEdit *c1edit = mC1Edit;
 
     //c2
     QLabel *c2label = new QLabel(tr("c2: "), mGroup2);
-    QLineEdit *c2edit = new QLineEdit(mGroup2);
+    QLineEdit *c2edit = mC2Edit;
 
     //layout
     QFormLayout *flayout = new QFormLayout(mGroup2);
@@ -263,6 +292,10 @@ void SingleObjectDialog::initializeGroup2()
     flayout->addRow(wlowerlabel, wloweredit);
     flayout->addRow(c1label, c1edit);
     flayout->addRow(c2label, c2edit);
+
+//    QVBoxLayout *hlayout = new QVBoxLayout(mGroup2);
+//    hlayout->addLayout(flayout);
+//    hlayout->addWidget(mWarningLabel1);
 
 }
 
@@ -279,3 +312,52 @@ void SingleObjectDialog::refreshTable()
         mInputModel->setItem(i, 1, new QStandardItem(QString::number(mInputValue[i][1])));
     }
 }
+
+bool SingleObjectDialog::isParamError()
+{
+    //判断输入参数是否为空
+    if(mInputValue.size() == 0){
+        mWarningLabel1->setText(tr("Error: Input Parameters is Empty!"));
+        return false;
+    }
+
+    bool isSizeDouble, isTimeInt, isRateDouble, isWUpperDouble, isWLowerDouble, isC1Double, isC2Double;
+    mSizeEdit->text().toDouble(&isSizeDouble);
+    mTimeEdit->text().toInt(&isTimeInt);
+    mRateEdit->text().toDouble(&isRateDouble);
+    mWUpperEdit->text().toDouble(&isWUpperDouble);
+    mWLowerEdit->text().toDouble(&isWLowerDouble);
+    mC1Edit->text().toDouble(&isC1Double);
+    mC2Edit->text().toDouble(&isC2Double);
+
+    if(!isSizeDouble){
+        mWarningLabel1->setText(tr("Error: Number of particles must be a number!"));
+        return false;
+    }
+    if(!isTimeInt){
+        mWarningLabel1->setText(tr("Error: Max iteration must be a integer!"));
+        return false;
+    }
+    if(!isRateDouble){
+        mWarningLabel1->setText(tr("Error: Mutation rate must be a number!"));
+        return false;
+    }
+    if(!isWUpperDouble){
+        mWarningLabel1->setText(tr("Error: Upper weight must be a number!"));
+        return false;
+    }
+    if(!isWLowerDouble){
+        mWarningLabel1->setText(tr("Erorr: Lower weight must be a number!"));
+        return false;
+    }
+    if(!isC1Double){
+        mWarningLabel1->setText(tr("Error: C1 must be a number!"));
+        return false;
+    }
+    if(!isC2Double){
+        mWarningLabel1->setText(tr("Error: C2 must be a number!"));
+        return false;
+    }
+    return true;
+}
+

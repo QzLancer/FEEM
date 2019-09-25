@@ -29,13 +29,15 @@ SOURCES += \
     main.cpp \
     multiobjectdialog.cpp \
     lineedit.cpp \
-    singleobjectcore/singleobjectcore.cpp
+    singleobjectcore/pso.cpp \
+    singleobjectcore/particle.cpp
 
 HEADERS += \
     singleobjectdialog.h \
     multiobjectdialog.h \
     lineedit.h \
-    singleobjectcore/singleobjectcore.h
+    singleobjectcore/pso.h \
+    singleobjectcore/particle.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
