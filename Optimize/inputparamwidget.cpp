@@ -101,12 +101,37 @@ void InputParamWidget::slotAddTableItem()
 void InputParamWidget::slotChangeData(const QModelIndex &topleft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
     qDebug() << "InputParamWidget::slotChangeData";
+    disconnect(mInputModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(slotChangeData(QModelIndex,QModelIndex,QVector<int>)));
+    qDebug() << "SingleObjectDialog::slotChangeData";
+    int row = topleft.row();
+    int column = topleft.column();
+    bool isDouble;
+    double data = mInputModel->data(topleft).toDouble(&isDouble);
 
+    //判断输入是否为数字
+    if(isDouble){
+        //判断左侧输入值是否小于右侧
+        QModelIndex index0 = mInputModel->index(row, 0);
+        QModelIndex index1 = mInputModel->index(row, 1);
+        if(mInputModel->data(index0) <= mInputModel->data(index1)){
+            mWarningLabel->setText(tr(""));
+            mInputValue[row][column] = data;
+        }else{
+            mWarningLabel->setText(tr("Error: The minimum must be less than the maximum!"));
+            mInputModel->setItem(row, 0 ,new QStandardItem(QString::number(mInputValue[row][0])));
+            mInputModel->setItem(row, 1 ,new QStandardItem(QString::number(mInputValue[row][1])));
+        }
+    }else{
+        mWarningLabel->setText(tr("Error: Properties must be number!"));
+        mInputModel->setData(topleft, mInputValue[row][column]);
+    }
+    connect(mInputModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(slotChangeData(QModelIndex,QModelIndex,QVector<int>)));
 }
 
 void InputParamWidget::slotDeleteTableItem()
 {
     qDebug() << "InputParamWidget::slotDeleteTableItem";
+
 }
 
 void InputParamWidget::refreshTable()

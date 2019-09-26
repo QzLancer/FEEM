@@ -9,6 +9,7 @@
 #include <QItemSelectionModel>
 #include <QLabel>
 #include "singleobjectcore/pso.h"
+#include "inputparamwidget.h"
 
 class SingleObjectDialog : public QDialog
 {
