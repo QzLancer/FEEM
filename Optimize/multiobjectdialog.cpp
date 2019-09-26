@@ -11,40 +11,22 @@ MultiObjectDialog::MultiObjectDialog(QWidget *parent)
     : QDialog (parent),
       mGroup1(new QGroupBox(this)),
       mGroup2(new QGroupBox(this)),
-      mTargetTable(new QTableView((mGroup1))),
-      mTargetModel(new QStandardItemModel(mGroup1)),
-      mTargetSelection(new QItemSelectionModel(mTargetModel)),
-      mTargetBox(new QComboBox(mGroup1)),
-      mModeBox(new QComboBox(mGroup1)),
       mInputWidget(new InputParamWidget(mGroup1)),
-      mTargetDeleteButton(new QPushButton(tr("Delete"), mGroup1)),
-      mTargetAddButton(new QPushButton(tr("Add"), mGroup1)),
-      mTargetWarningLabel(new QLabel(mGroup1))
+      mTargetWidget(new TargetWidget(mGroup1))
 {
     initialize();
 }
 
 MultiObjectDialog::~MultiObjectDialog()
 {
-    delete mTargetWarningLabel;
-    delete mTargetAddButton;
-    delete mTargetDeleteButton;
+    delete mTargetWidget;
     delete mInputWidget;
-    delete mModeBox;
-    delete mTargetBox;
-    delete mTargetSelection;
-    delete mTargetModel;
-    delete mTargetTable;
     delete mGroup2;
     delete mGroup1;
 }
 
 void MultiObjectDialog::initialize()
 {
-    QPalette pe;
-    pe.setColor(QPalette::WindowText, Qt::red);
-    mTargetWarningLabel->setPalette(pe);
-
     setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
     initializeGroup1();
     initializeGroup2();
@@ -93,47 +75,10 @@ void MultiObjectDialog::initializeGroup1()
 {
     mGroup1->setTitle(tr("Target to be optimized && input parameters"));
 
-    //优化目标
-    QLabel *targetlabel = new QLabel(tr("Target to be optimized"), mGroup1);
-    QTableView *targettable = mTargetTable;
-    QLabel *targetlabel1 = new QLabel(tr("Target to be optimized: "), mGroup1);
-    QComboBox *targetbox = mTargetBox;
-    QLabel *modelabel = new QLabel(tr("Optimize mode: "), mGroup1);
-    QComboBox *modebox = mModeBox;
-
-
-    mTargetTable->setModel(mTargetModel);
-    QStringList inputlist;
-    inputlist << tr("Target to be optimized") << tr("Optimize mode");
-    mTargetModel->setHorizontalHeaderLabels(inputlist);
-    mTargetTable->resizeColumnsToContents();
-
-
-    //layout
-    QGridLayout *glayout = new QGridLayout;
-    glayout->addWidget(targetlabel, 0, 0);
-    glayout->addWidget(targettable, 1, 0, 1, 2);
-    glayout->addWidget(targetlabel1, 2, 0);
-    glayout->addWidget(targetbox, 2, 1);
-    glayout->addWidget(modelabel, 3, 0);
-    glayout->addWidget(modebox, 3, 1);
-
-    QHBoxLayout *buttonlayout = new QHBoxLayout;
-    buttonlayout->addStretch();
-    buttonlayout->addWidget(mTargetDeleteButton);
-    buttonlayout->addWidget(mTargetAddButton);
-
-    QVBoxLayout *targetlayout = new QVBoxLayout;
-    targetlayout->addLayout(glayout);
-    targetlayout->addLayout(buttonlayout);
-    targetlayout->addWidget(mTargetWarningLabel);
-
     QHBoxLayout *hlayout = new QHBoxLayout(mGroup1);
-    QWidget *widget = new QWidget(mGroup1);
-    widget->setLayout(targetlayout);
-    hlayout->addWidget(widget);
+    hlayout->addWidget(mTargetWidget);
     hlayout->addWidget(mInputWidget);
-    hlayout->setStretchFactor(widget, 1);
+    hlayout->setStretchFactor(mTargetWidget, 1);
     hlayout->setStretchFactor(mInputWidget, 1);
 
 }

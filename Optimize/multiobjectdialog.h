@@ -4,9 +4,9 @@
 #include <QGroupBox>
 #include <QList>
 #include <QString>
-#include "inputparamwidget.h"
 #include <QLineEdit>
-#include <QComboBox>
+#include "inputparamwidget.h"
+#include "targetwidget.h"
 
 class MultiObjectDialog : public QDialog
 {
@@ -31,17 +31,8 @@ private:
     QGroupBox *mGroup2;
     QStringList mInputList;
     QStringList mTargetList;
-
-    //target控件
-    QTableView *mTargetTable;
-    QStandardItemModel *mTargetModel;
-    QItemSelectionModel *mTargetSelection;
-    QComboBox *mTargetBox;
-    QComboBox *mModeBox;
     InputParamWidget *mInputWidget;
-    QPushButton *mTargetDeleteButton;
-    QPushButton *mTargetAddButton;
-    QLabel *mTargetWarningLabel;
+    TargetWidget *mTargetWidget;
 };
 
 #endif // MULTIOBJECTDIALOG_H
