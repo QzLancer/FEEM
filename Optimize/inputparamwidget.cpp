@@ -6,8 +6,6 @@
 
 InputParamWidget::InputParamWidget(QWidget *parent) :
     QWidget(parent),
-    mInputModel(new QStandardItemModel(this)),
-    mInputSelection(new QItemSelectionModel(mInputModel)),
     mInputTable(new QTableView(this)),
     mInputBox(new QComboBox(this)),
     mMaxInputEdit(new QLineEdit(this)),
@@ -15,9 +13,12 @@ InputParamWidget::InputParamWidget(QWidget *parent) :
     mWarningLabel(new QLabel(this)),
     mGridLayout(new QGridLayout),
     mDeleteButton(new QPushButton(tr("Delete"), this)),
-    mAddButton(new QPushButton(tr("Add"), this))
+    mAddButton(new QPushButton(tr("Add"), this)),
+    mInputModel(new QStandardItemModel(mInputTable)),
+    mInputSelection(new QItemSelectionModel(mInputModel))
 {
     //label设置
+//    setContentsMargins(1, 1, 1, 1);
     QLabel *InputParamLabel0 = new QLabel(tr("Input parameters"), this);
     QLabel *InputParamLabel1 = new QLabel(tr("Input parameters"), this);
     QLabel *InputParamMin = new QLabel(tr("Minimum of input parameters: "), this);
@@ -32,6 +33,7 @@ InputParamWidget::InputParamWidget(QWidget *parent) :
     mInputModel->setHorizontalHeaderLabels(inputlist);
     mInputTable->showGrid();
     mInputTable->setModel(mInputModel);
+    mInputTable->resizeColumnsToContents();
 
     //设置layout
     mGridLayout->addWidget(InputParamLabel0, 0, 0);

@@ -30,8 +30,6 @@ private slots:
     void slotDeleteTableItem();
 private:
     //table中的数据
-    QStandardItemModel *mInputModel;
-    QItemSelectionModel *mInputSelection;
     QStringList mInputParamName;
     QList<QList<double>> mInputValue;
     QTableView *mInputTable;
@@ -43,7 +41,8 @@ private:
     QPushButton *mDeleteButton;
     QPushButton *mAddButton;
     QStringList mInputList;
-
+    QStandardItemModel *mInputModel;
+    QItemSelectionModel *mInputSelection;
     void refreshTable();
 };
 

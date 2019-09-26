@@ -215,8 +215,8 @@ void SingleObjectDialog::initializeGroup2()
     flayout->addRow(sizelabel, sizeedit);
     flayout->addRow(timelabel, timeedit);
     flayout->addRow(ratelabel, rateedit);
-    flayout->addRow(wupperlabel, wupperedit);
     flayout->addRow(wlowerlabel, wloweredit);
+    flayout->addRow(wupperlabel, wupperedit);
     flayout->addRow(c1label, c1edit);
     flayout->addRow(c2label, c2edit);
 

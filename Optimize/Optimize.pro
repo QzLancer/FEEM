@@ -30,14 +30,16 @@ SOURCES += \
     multiobjectdialog.cpp \
     singleobjectcore/pso.cpp \
     singleobjectcore/particle.cpp \
-    inputparamwidget.cpp
+    inputparamwidget.cpp \
+    targetwidget.cpp
 
 HEADERS += \
     singleobjectdialog.h \
     multiobjectdialog.h \
     singleobjectcore/pso.h \
     singleobjectcore/particle.h \
-    inputparamwidget.h
+    inputparamwidget.h \
+    targetwidget.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

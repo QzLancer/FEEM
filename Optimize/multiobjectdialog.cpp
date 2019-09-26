@@ -3,28 +3,48 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QLabel>
-#include <QLineEdit>
 #include <QFormLayout>
 #include <QGridLayout>
 #include <QTableView>
-#include <QComboBox>
 #include <QDebug>
 MultiObjectDialog::MultiObjectDialog(QWidget *parent)
-    : QDialog (parent) ,
-      mGroup1(new QGroupBox(this)) ,
-      mGroup2(new QGroupBox(this))
+    : QDialog (parent),
+      mGroup1(new QGroupBox(this)),
+      mGroup2(new QGroupBox(this)),
+      mTargetTable(new QTableView((mGroup1))),
+      mTargetModel(new QStandardItemModel(mGroup1)),
+      mTargetSelection(new QItemSelectionModel(mTargetModel)),
+      mTargetBox(new QComboBox(mGroup1)),
+      mModeBox(new QComboBox(mGroup1)),
+      mInputWidget(new InputParamWidget(mGroup1)),
+      mTargetDeleteButton(new QPushButton(tr("Delete"), mGroup1)),
+      mTargetAddButton(new QPushButton(tr("Add"), mGroup1)),
+      mTargetWarningLabel(new QLabel(mGroup1))
 {
     initialize();
 }
 
 MultiObjectDialog::~MultiObjectDialog()
 {
+    delete mTargetWarningLabel;
+    delete mTargetAddButton;
+    delete mTargetDeleteButton;
+    delete mInputWidget;
+    delete mModeBox;
+    delete mTargetBox;
+    delete mTargetSelection;
+    delete mTargetModel;
+    delete mTargetTable;
     delete mGroup2;
     delete mGroup1;
 }
 
 void MultiObjectDialog::initialize()
 {
+    QPalette pe;
+    pe.setColor(QPalette::WindowText, Qt::red);
+    mTargetWarningLabel->setPalette(pe);
+
     setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
     initializeGroup1();
     initializeGroup2();
@@ -61,7 +81,7 @@ void MultiObjectDialog::setTargetList(QStringList targetlist)
     mTargetList = targetlist;
 }
 
-QStringList MultiObjectDialog::InputList()
+QStringList MultiObjectDialog::getInputList()
 {
     if(mInputList.empty()){
         qDebug() << "InputList is empty!";
@@ -75,48 +95,52 @@ void MultiObjectDialog::initializeGroup1()
 
     //优化目标
     QLabel *targetlabel = new QLabel(tr("Target to be optimized"), mGroup1);
-    QTableView *targettable = new QTableView(mGroup1);
+    QTableView *targettable = mTargetTable;
     QLabel *targetlabel1 = new QLabel(tr("Target to be optimized: "), mGroup1);
-    QComboBox *targetbox = new QComboBox(mGroup1);
+    QComboBox *targetbox = mTargetBox;
     QLabel *modelabel = new QLabel(tr("Optimize mode: "), mGroup1);
-    QComboBox *modebox = new QComboBox(mGroup1);
-    QPushButton *addtargetbutton = new QPushButton(tr("Add"), mGroup1);
+    QComboBox *modebox = mModeBox;
 
-    //输入参数
-    QLabel *inputparamlabel = new QLabel(tr("Input parameters: "), mGroup1);
-    QTableView *inputparamtable = new QTableView(mGroup1);
-    QLabel *inputparamlabel1 = new QLabel(tr("Input parameters: "), mGroup1);
-    QComboBox *inputparambox = new QComboBox(mGroup1);
-    QLabel *maxinputlabel = new QLabel(tr("Maximum of input parameter: "), mGroup1);
-    QLineEdit *maxinputedit = new QLineEdit(mGroup1);
-    QLabel *mininputlabel = new QLabel(tr("Minimum of input parameter: "), mGroup1);
-    QLineEdit *mininputedit = new QLineEdit(mGroup1);
-    QPushButton *addinputbutton = new QPushButton(tr("Add"), mGroup1);
+
+    mTargetTable->setModel(mTargetModel);
+    QStringList inputlist;
+    inputlist << tr("Target to be optimized") << tr("Optimize mode");
+    mTargetModel->setHorizontalHeaderLabels(inputlist);
+    mTargetTable->resizeColumnsToContents();
+
 
     //layout
-    QGridLayout *glayout = new QGridLayout(mGroup1);
+    QGridLayout *glayout = new QGridLayout;
     glayout->addWidget(targetlabel, 0, 0);
     glayout->addWidget(targettable, 1, 0, 1, 2);
     glayout->addWidget(targetlabel1, 2, 0);
     glayout->addWidget(targetbox, 2, 1);
     glayout->addWidget(modelabel, 3, 0);
     glayout->addWidget(modebox, 3, 1);
-    glayout->addWidget(addtargetbutton, 4, 1);
 
-    glayout->addWidget(inputparamlabel, 0, 2);
-    glayout->addWidget(inputparamtable, 1, 2, 1, 2);
-    glayout->addWidget(inputparamlabel1, 2, 2);
-    glayout->addWidget(inputparambox, 2, 3);
-    glayout->addWidget(maxinputlabel, 3, 2);
-    glayout->addWidget(maxinputedit, 3, 3);
-    glayout->addWidget(mininputlabel, 4, 2);
-    glayout->addWidget(mininputedit, 4, 3);
-    glayout->addWidget(addinputbutton, 5, 3);
+    QHBoxLayout *buttonlayout = new QHBoxLayout;
+    buttonlayout->addStretch();
+    buttonlayout->addWidget(mTargetDeleteButton);
+    buttonlayout->addWidget(mTargetAddButton);
+
+    QVBoxLayout *targetlayout = new QVBoxLayout;
+    targetlayout->addLayout(glayout);
+    targetlayout->addLayout(buttonlayout);
+    targetlayout->addWidget(mTargetWarningLabel);
+
+    QHBoxLayout *hlayout = new QHBoxLayout(mGroup1);
+    QWidget *widget = new QWidget(mGroup1);
+    widget->setLayout(targetlayout);
+    hlayout->addWidget(widget);
+    hlayout->addWidget(mInputWidget);
+    hlayout->setStretchFactor(widget, 1);
+    hlayout->setStretchFactor(mInputWidget, 1);
+
 }
 
 void MultiObjectDialog::initializeGroup2()
 {
-    mGroup2->setTitle(tr("Single target PSO parameters"));
+    mGroup2->setTitle(tr("Multiple target PSO parameters"));
 
     //种群大小
     QLabel *sizelabel = new QLabel(tr("Population size: "), mGroup2);
