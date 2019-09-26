@@ -42,8 +42,6 @@ int main(int argc, char *argv[])
 
 //    pso.printBest();
 
-    InputParamWidget iw;
-    iw.show();
     return a.exec();
 }
 

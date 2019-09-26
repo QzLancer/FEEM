@@ -13,10 +13,6 @@ SingleObjectDialog::SingleObjectDialog(QWidget *parent)
       mGroup1(new QGroupBox(this)),
       mGroup2(new QGroupBox(this)),
       mTargetBox(new QComboBox(mGroup1)),
-      mInputBox(new QComboBox(mGroup1)),
-      mInputModel(new QStandardItemModel),
-      mInputSelection(new QItemSelectionModel(mInputModel)),
-      mWarningLabel(new QLabel(mGroup1)),
       mSizeEdit(new QLineEdit(mGroup2)),
       mTimeEdit(new QLineEdit(mGroup2)),
       mRateEdit(new QLineEdit(mGroup2)),
@@ -24,13 +20,15 @@ SingleObjectDialog::SingleObjectDialog(QWidget *parent)
       mWLowerEdit(new QLineEdit(mGroup2)),
       mC1Edit(new QLineEdit(mGroup2)),
       mC2Edit(new QLineEdit(mGroup2)),
-      mWarningLabel1(new QLabel(mGroup2))
+      mWarningLabel1(new QLabel(mGroup2)),
+      mInputWidget(new InputParamWidget(mGroup1))
 {
     initialize();
 }
 
 SingleObjectDialog::~SingleObjectDialog()
 {
+    delete mInputWidget;
     delete mWarningLabel1;
     delete mC2Edit;
     delete mC1Edit;
@@ -39,10 +37,6 @@ SingleObjectDialog::~SingleObjectDialog()
     delete mRateEdit;
     delete mTimeEdit;
     delete mSizeEdit;
-    delete mWarningLabel;
-    delete mInputSelection;
-    delete mInputModel;
-    delete mInputBox;
     delete mTargetBox;
     delete mGroup2;
     delete mGroup1;
@@ -85,7 +79,7 @@ void SingleObjectDialog::initialize(QStringList inputlist, QStringList targetlis
 void SingleObjectDialog::setInputList(QStringList inputlist)
 {
     mInputList = inputlist;
-    mInputBox->addItems(mInputList);
+    mInputWidget->setInputList(mInputList);
 }
 
 void SingleObjectDialog::setTargetList(QStringList targetlist)
@@ -110,64 +104,23 @@ QStringList SingleObjectDialog::TargetList()
     return mTargetList;
 }
 
-void SingleObjectDialog::slotAddTableItem(QString item, double minimum, double maximum)
-{
-    qDebug() << "SingleObjectDialog::slotAddTableItem";
-    if(!mInputParamName.contains(item)){
-        mInputParamName.append(item);
-        QList<double> value;
-        value << minimum << maximum;
-        mInputValue.append(value);
-        refreshTable();
-    }
-}
-
-void SingleObjectDialog::slotChangeData(const QModelIndex &topleft, const QModelIndex &bottomRight, const QVector<int> &roles)
-{
-    disconnect(mInputModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(slotChangeData(QModelIndex,QModelIndex,QVector<int>)));
-    qDebug() << "SingleObjectDialog::slotChangeData";
-    int row = topleft.row();
-    int column = topleft.column();
-    bool isDouble;
-    double data = mInputModel->data(topleft).toDouble(&isDouble);
-
-    //判断输入是否为数字
-    if(isDouble){
-        //判断左侧输入值是否小于右侧
-        QModelIndex index0 = mInputModel->index(row, 0);
-        QModelIndex index1 = mInputModel->index(row, 1);
-        if(mInputModel->data(index0) <= mInputModel->data(index1)){
-            mWarningLabel->setText(tr(""));
-            mInputValue[row][column] = data;
-        }else{
-            mWarningLabel->setText(tr("Error: The minimum must be less than the maximum!"));
-//            mInputModel->setData(topleft, mInputValue[row][column]);
-            mInputModel->setItem(row, 0 ,new QStandardItem(QString::number(mInputValue[row][0])));
-            mInputModel->setItem(row, 1 ,new QStandardItem(QString::number(mInputValue[row][1])));
-        }
-    }else{
-        mWarningLabel->setText(tr("Error: Properties must be number!"));
-        mInputModel->setData(topleft, mInputValue[row][column]);
-    }
-    connect(mInputModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(slotChangeData(QModelIndex,QModelIndex,QVector<int>)));
-}
-
 void SingleObjectDialog::slotOptimize()
 {
+    QList<QList<double>> InputValue = mInputWidget->getInputValue();
     if(isParamError()){
         qDebug() << "Input parameter OK!";
         //将input parameter转换成可以传递的形式
-        double *lower = new double[static_cast<unsigned long long>(mInputValue.size())];
-        double *upper = new double[static_cast<unsigned long long>(mInputValue.size())];
-        double *vmax = new double[static_cast<unsigned long long>(mInputValue.size())]; //粒子最大速度
-        for(int i = 0; i < mInputValue.size(); ++i){
-            lower[i] = mInputValue[i][0];
-            upper[i] = mInputValue[i][1];
+        double *lower = new double[static_cast<unsigned long long>(InputValue.size())];
+        double *upper = new double[static_cast<unsigned long long>(InputValue.size())];
+        double *vmax = new double[static_cast<unsigned long long>(InputValue.size())]; //粒子最大速度
+        for(int i = 0; i < InputValue.size(); ++i){
+            lower[i] = InputValue[i][0];
+            upper[i] = InputValue[i][1];
             vmax[i] = 0.1;
         }
         //读取各个lineedit中的数据，目前变异概率不使用
         int numberOfParticles = mSizeEdit->text().toInt();
-        int numberOfVariables = mInputValue.size();
+        int numberOfVariables = InputValue.size();
         int maxIteration = mTimeEdit->text().toInt();
         double lowerWeight = mWLowerEdit->text().toDouble();
         double upperWeight = mWUpperEdit->text().toDouble();
@@ -213,52 +166,6 @@ void SingleObjectDialog::initializeGroup1()
     modebox->addItem(tr("Minimize"));
     modebox->addItem(tr("Maximize"));
 
-    //输入参数
-    QLabel *inputparamlabel = new QLabel(tr("Input parameters"), mGroup1);
-    QTableView *inputparamtable = new QTableView(mGroup1);
-    QLabel *inputparamlabel1 = new QLabel(tr("Input parameters"), mGroup1);
-    QComboBox *inputparambox = mInputBox;
-    QLabel *mininputparamlabel = new QLabel(tr("Minimum of input parameters: "), mGroup1);
-    QLineEdit *mininputparamedit = new QLineEdit(mGroup1);
-    QLabel *maxinputparamlabel = new QLabel(tr("Maximum of input parameters: "), mGroup1);
-    QLineEdit *maxinputparamedit = new QLineEdit(mGroup1);
-    QLabel *warninglabel = mWarningLabel;
-    QPalette pe;
-    pe.setColor(QPalette::WindowText, Qt::red);
-    mWarningLabel->setPalette(pe);
-    QPushButton *addbutton = new QPushButton(tr("Add"), mGroup1);
-    QPushButton *deletebutton = new QPushButton(tr("Delete"), mGroup1);
-
-    //表头初始化
-    QStringList inputlist;
-    inputlist << tr("Minimum of input parameters") << tr("Maximum of input parameters");
-    mInputModel->setHorizontalHeaderLabels(inputlist);
-    inputparamtable->showGrid();
-    inputparamtable->setModel(mInputModel);
-
-    //添加表格元素
-    connect(addbutton, &QPushButton::clicked, [this, inputparambox, mininputparamedit, maxinputparamedit]{
-        disconnect(mInputModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(slotChangeData(QModelIndex,QModelIndex,QVector<int>)));
-        bool isMinDouble = 0;
-        bool isMaxDouble = 0;
-        double minimum = mininputparamedit->text().toDouble(&isMinDouble);
-        double maximum = maxinputparamedit->text().toDouble(&isMaxDouble);
-        if(isMinDouble && isMaxDouble){
-            if(minimum <= maximum){
-                mWarningLabel->setText("");
-                slotAddTableItem(inputparambox->currentText(), mininputparamedit->text().toDouble(), maxinputparamedit->text().toDouble());
-            }else{
-                mWarningLabel->setText(tr("Error: The minimum must be less than the maximum!"));
-            }
-        }else{
-            mWarningLabel->setText(tr("Error: Properties must be number!"));
-        }
-        connect(mInputModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(slotChangeData(QModelIndex,QModelIndex,QVector<int>)));
-    });
-    //修改表格数据之后修改对应List
-    connect(mInputModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(slotChangeData(QModelIndex,QModelIndex,QVector<int>)));
-
-    //删除表格的某一行
     //layout
     QGridLayout *gridlayout = new QGridLayout;
     gridlayout->addWidget(targetlabel, 0, 0);
@@ -266,31 +173,9 @@ void SingleObjectDialog::initializeGroup1()
     gridlayout->addWidget(modelabel, 1 ,0);
     gridlayout->addWidget(modebox, 1, 1);
 
-    gridlayout->addWidget(inputparamlabel, 2, 0);
-    gridlayout->addWidget(inputparamtable, 3, 0, 1, 2);
-
-    gridlayout->addWidget(inputparamlabel1, 4, 0);
-    gridlayout->addWidget(inputparambox, 4, 1);
-    gridlayout->addWidget(mininputparamlabel, 5, 0);
-    gridlayout->addWidget(mininputparamedit, 5, 1);
-    gridlayout->addWidget(maxinputparamlabel, 6, 0);
-    gridlayout->addWidget(maxinputparamedit, 6, 1);
-//    gridlayout->addWidget(addbutton, 7, 1);
-//    gridlayout->addWidget(deletebutton, 7, 0);
-
-    QHBoxLayout *hlayout = new QHBoxLayout;
-    hlayout->addStretch();
-    hlayout->addWidget(deletebutton);
-    hlayout->addWidget(addbutton);
-
     QVBoxLayout *vlayout = new QVBoxLayout(mGroup1);
     vlayout->addLayout(gridlayout);
-    vlayout->addLayout(hlayout);
-    vlayout->addWidget(warninglabel);
-
-    //table setting
-    inputparamtable->setShowGrid(true);
-
+    vlayout->addWidget(mInputWidget);
 }
 
 void SingleObjectDialog::initializeGroup2()
@@ -335,30 +220,16 @@ void SingleObjectDialog::initializeGroup2()
     flayout->addRow(c1label, c1edit);
     flayout->addRow(c2label, c2edit);
 
-//    QVBoxLayout *hlayout = new QVBoxLayout(mGroup2);
-//    hlayout->addLayout(flayout);
-//    hlayout->addWidget(mWarningLabel1);
+    //    QVBoxLayout *hlayout = new QVBoxLayout(mGroup2);
+    //    hlayout->addLayout(flayout);
+    //    hlayout->addWidget(mWarningLabel1);
 
-}
-
-void SingleObjectDialog::refreshTable()
-{
-    mInputModel->setRowCount(mInputParamName.size());
-    for(int i = 0; i < mInputParamName.size(); ++i){
-        qDebug() << mInputParamName[i];
-        mInputModel->setHeaderData(i, Qt::Vertical, mInputParamName[i]);
-    }
-    for(int i = 0; i < mInputValue.size(); ++i){
-        qDebug() << mInputValue;
-        mInputModel->setItem(i, 0, new QStandardItem(QString::number(mInputValue[i][0])));
-        mInputModel->setItem(i, 1, new QStandardItem(QString::number(mInputValue[i][1])));
-    }
 }
 
 bool SingleObjectDialog::isParamError()
 {
     //判断输入参数是否为空
-    if(mInputValue.size() == 0){
+    if(mInputWidget->getInputValue().size() == 0){
         mWarningLabel1->setText(tr("Error: Input Parameters is Empty!"));
         return false;
     }

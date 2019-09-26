@@ -57,6 +57,11 @@ InputParamWidget::InputParamWidget(QWidget *parent) :
     connect(mDeleteButton, &QPushButton::clicked, this, &InputParamWidget::slotDeleteTableItem);
 }
 
+QList<QList<double> > InputParamWidget::getInputValue() const
+{
+    return mInputValue;
+}
+
 void InputParamWidget::setWarning(QString string)
 {
     mWarningLabel->setText(string);

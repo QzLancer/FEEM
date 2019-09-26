@@ -30,8 +30,6 @@ public:
     QStringList TargetList();
 
 public slots:
-    void slotAddTableItem(QString item, double minimum, double maximum);
-    void slotChangeData(const QModelIndex &topleft, const QModelIndex &bottomRight, const QVector<int> &roles);
     void slotOptimize();
 
 private:
@@ -46,16 +44,7 @@ private:
     QStringList mInputList;
 
     //控件
-    QComboBox *mTargetBox;
-    QComboBox *mInputBox;
-
-    //table中的数据
-    QStandardItemModel *mInputModel;
-    QItemSelectionModel *mInputSelection;
-    QStringList mInputParamName;
-    QList<QList<double>> mInputValue;
-
-    QLabel *mWarningLabel;
+    QComboBox *mTargetBox; 
 
     //所有的参数输入LineEdit
     QLineEdit *mSizeEdit;
@@ -67,6 +56,7 @@ private:
     QLineEdit *mC2Edit;
     QLabel *mWarningLabel1;
 
+    InputParamWidget *mInputWidget;
     //求解器
     static void objectiveFunction (Particle *Particle);
 };
