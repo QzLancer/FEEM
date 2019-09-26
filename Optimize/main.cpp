@@ -4,6 +4,7 @@
 #include <QString>
 #include <singleobjectcore/pso.h>
 //void objectiveFunction (Particle *Particle);
+#include "inputparamwidget.h"
 
 int main(int argc, char *argv[])
 {
@@ -41,6 +42,8 @@ int main(int argc, char *argv[])
 
 //    pso.printBest();
 
+    InputParamWidget iw;
+    iw.show();
     return a.exec();
 }
 

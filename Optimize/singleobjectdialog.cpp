@@ -408,10 +408,6 @@ void SingleObjectDialog::objectiveFunction(Particle *Particle)
     const double *_position = Particle->getPosition ();
     double _constraits;
 
-    if (Particle::getNumberOfVariables () != 2) {
-        throw "Number of variables in Particles does not match number of variables in objective function" ;
-    }
-
     Particle->setValue(100 * pow((_position[1] - pow(_position[0], 2)), 2) + pow((1 - _position[0]), 2));
     _constraits = _position[1] + _position[0] > 1 ? 10000000 * (_position[1] + _position[0] - 1) : 0;
     //_constraits = 0;
