@@ -2,6 +2,7 @@
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QDebug>
 
 TargetWidget::TargetWidget(QWidget *parent)
     : QWidget(parent),
@@ -12,7 +13,8 @@ TargetWidget::TargetWidget(QWidget *parent)
       mModeBox(new QComboBox(this)),
       mTargetDeleteButton(new QPushButton(tr("Delete"), this)),
       mTargetAddButton(new QPushButton(tr("Add"), this)),
-      mTargetWarningLabel(new QLabel(this))
+      mTargetWarningLabel(new QLabel(this)),
+      mItemDelegate(new ItemDelegate(this))
 
 {
     QPalette pe;
@@ -31,7 +33,11 @@ TargetWidget::TargetWidget(QWidget *parent)
     QStringList inputlist;
     inputlist << tr("Target to be optimized") << tr("Optimize mode");
     mTargetModel->setHorizontalHeaderLabels(inputlist);
+    mTargetTable->setItemDelegateForColumn(1, mItemDelegate);
     mTargetTable->resizeColumnsToContents();
+    QStringList modelist;
+    modelist << tr("Maximize") << tr("Minimize");
+    mModeBox->addItems(modelist);
 
     //layout
     QGridLayout *glayout = new QGridLayout;
@@ -51,4 +57,74 @@ TargetWidget::TargetWidget(QWidget *parent)
     targetlayout->addLayout(glayout);
     targetlayout->addLayout(buttonlayout);
     targetlayout->addWidget(mTargetWarningLabel);
+
+
+    //connect
+    connect(mTargetAddButton, &QPushButton::clicked, this, &TargetWidget::slotAddTableItem);
+    connect(mTargetDeleteButton, &QPushButton::clicked, this, &TargetWidget::slotDeleteTableItem);
+    connect(mTargetModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(slotChangeData(QModelIndex,QModelIndex,QVector<int>)));
+}
+
+QStringList TargetWidget::getTargetList() const
+{
+    return mTargetList;
+}
+
+QStringList TargetWidget::getModeList() const
+{
+    return mModeList;
+}
+
+void TargetWidget::setTargetList(QStringList targetlist)
+{
+    mTargetList = targetlist;
+    mTargetBox->addItems(mTargetList);
+}
+
+void TargetWidget::setModeList(QStringList modelist)
+{
+    mModeList = modelist;
+    mTargetBox->addItems(mModeList);
+}
+
+void TargetWidget::slotAddTableItem()
+{
+    qDebug() << "TargetWidget::slotAddTableItem";
+    disconnect(mTargetModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(slotChangeData(QModelIndex,QModelIndex,QVector<int>)));
+    QString target = mTargetBox->currentText();
+    QString mode = mModeBox->currentText();
+    if(!mTargetModeMap.contains(mTargetBox->currentText())){
+        setWarning(tr(""));
+        mTargetModeMap.insert(target, mode);
+        refreshTable();
+    }else{
+        setWarning(tr("Error: Current Target Exist!"));
+    }
+    connect(mTargetModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(slotChangeData(QModelIndex,QModelIndex,QVector<int>)));
+}
+
+void TargetWidget::slotChangeData(const QModelIndex &topleft, const QModelIndex &bottomRight, const QVector<int> &roles)
+{
+    qDebug() << "TargetWidget::slotChangeData";
+}
+
+void TargetWidget::slotDeleteTableItem()
+{
+    qDebug() << "TargetWidget::slotDeleteTableItem";
+}
+
+void TargetWidget::setWarning(QString string)
+{
+    mTargetWarningLabel->setText(string);
+}
+
+void TargetWidget::refreshTable()
+{
+    mTargetModel->setRowCount(mTargetModeMap.size());
+    int count = 0;
+    for(auto i = mTargetModeMap.begin(); i != mTargetModeMap.end(); ++i){
+        mTargetModel->setItem(count, 0, new QStandardItem(i.key()));
+        mTargetModel->setItem(count, 1, new QStandardItem(i.value()));
+        ++count;
+    }
 }

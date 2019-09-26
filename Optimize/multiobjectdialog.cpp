@@ -56,11 +56,13 @@ void MultiObjectDialog::initialize(QStringList inputlist, QStringList targetlist
 void MultiObjectDialog::setInputList(QStringList inputlist)
 {
     mInputList = inputlist;
+    mInputWidget->setInputList(mInputList);
 }
 
 void MultiObjectDialog::setTargetList(QStringList targetlist)
 {
     mTargetList = targetlist;
+    mTargetWidget->setTargetList(mTargetList);
 }
 
 QStringList MultiObjectDialog::getInputList()

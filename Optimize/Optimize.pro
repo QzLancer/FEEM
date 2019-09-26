@@ -31,7 +31,8 @@ SOURCES += \
     singleobjectcore/pso.cpp \
     singleobjectcore/particle.cpp \
     inputparamwidget.cpp \
-    targetwidget.cpp
+    targetwidget.cpp \
+    itemdelegate.cpp
 
 HEADERS += \
     singleobjectdialog.h \
@@ -39,7 +40,8 @@ HEADERS += \
     singleobjectcore/pso.h \
     singleobjectcore/particle.h \
     inputparamwidget.h \
-    targetwidget.h
+    targetwidget.h \
+    itemdelegate.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

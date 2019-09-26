@@ -145,11 +145,9 @@ void InputParamWidget::refreshTable()
 {
     mInputModel->setRowCount(mInputParamName.size());
     for(int i = 0; i < mInputParamName.size(); ++i){
-        qDebug() << mInputParamName[i];
         mInputModel->setHeaderData(i, Qt::Vertical, mInputParamName[i]);
     }
     for(int i = 0; i < mInputValue.size(); ++i){
-        qDebug() << mInputValue;
         mInputModel->setItem(i, 0, new QStandardItem(QString::number(mInputValue[i][0])));
         mInputModel->setItem(i, 1, new QStandardItem(QString::number(mInputValue[i][1])));
     }

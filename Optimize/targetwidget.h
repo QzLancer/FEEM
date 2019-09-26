@@ -7,12 +7,20 @@
 #include <QComboBox>
 #include <QPushButton>
 #include <QLabel>
+#include "itemdelegate.h"
 
 class TargetWidget : public QWidget
 {
     Q_OBJECT
 public:
     explicit TargetWidget(QWidget *parent = nullptr);
+
+    //getter
+    QStringList getTargetList() const;
+    QStringList getModeList() const;
+    //setter
+    void setTargetList(QStringList targetlist);
+    void setModeList(QStringList modelist);
 
     enum OptimizeMode{
         MINIMIZE,
@@ -21,9 +29,14 @@ public:
 
 signals:
 
-public slots:
+private slots:
+    void slotAddTableItem();
+    void slotChangeData(const QModelIndex &topleft, const QModelIndex &bottomRight, const QVector<int> &roles);
+    void slotDeleteTableItem();
 
 private:
+    void setWarning(QString string);
+    void refreshTable();
     //target控件
     QTableView *mTargetTable;
     QStandardItemModel *mTargetModel;
@@ -33,12 +46,13 @@ private:
     QPushButton *mTargetDeleteButton;
     QPushButton *mTargetAddButton;
     QLabel *mTargetWarningLabel;
+    ItemDelegate *mItemDelegate;
 
     //ComboBox中的列表
     QStringList mTargetList;
     QStringList mModeList;
     //Table中被添加的选项
-    QMap<QString, OptimizeMode> mTargetModeMap;
+    QMap<QString, QString> mTargetModeMap;
 };
 
 #endif // TARGETWIDGET_H
