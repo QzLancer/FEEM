@@ -113,6 +113,11 @@ void TargetWidget::slotAddTableItem()
 void TargetWidget::slotChangeData(const QModelIndex &topleft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
     qDebug() << "TargetWidget::slotChangeData";
+    disconnect(mTargetModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(slotChangeData(QModelIndex,QModelIndex,QVector<int>)));
+    QString key = mTargetModel->item(topleft.row())->text();
+    mTargetModeMap[key] = mTargetModel->itemFromIndex(topleft)->text();
+//    qDebug() << mTargetModeMap;
+    connect(mTargetModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(slotChangeData(QModelIndex,QModelIndex,QVector<int>)));
 }
 
 void TargetWidget::slotDeleteTableItem()
