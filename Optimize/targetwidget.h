@@ -21,7 +21,7 @@ public:
     //setter
     void setTargetList(QStringList targetlist);
     void setModeList(QStringList modelist);
-
+    void setWarning(QString string);
     enum OptimizeMode{
         MINIMIZE,
         MAXIMIZE,
@@ -35,7 +35,6 @@ private slots:
     void slotDeleteTableItem();
 
 private:
-    void setWarning(QString string);
     void refreshTable();
     //target控件
     QTableView *mTargetTable;

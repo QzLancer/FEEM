@@ -234,6 +234,7 @@ bool SingleObjectDialog::isParamError()
         mWarningLabel1->setText(tr("Error: Input Parameters is Empty!"));
         return false;
     }
+    mInputWidget->setWarning("");
 
     bool isSizeInt, isTimeInt, isRateDouble, isWUpperDouble, isWLowerDouble, isC1Double, isC2Double;
     mSizeEdit->text().toInt(&isSizeInt);
