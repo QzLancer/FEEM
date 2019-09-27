@@ -10,6 +10,11 @@ PF_Point::PF_Point(PF_EntityContainer *parent, PF_GraphicView *view, const PF_Po
     m_index = point_index;
 }
 
+PF::EntityType PF_Point::rtti() const
+{
+    return PF::EntityPoint;
+}
+
 PF_Vector PF_Point::getCenter() const
 {
     return data.pos;
@@ -141,7 +146,7 @@ void PF_Point::draw(QCPPainter *painter)
         painter->drawLine(QPointF(x-width,y-width + i),QPointF(x+width,y-width+i));
 //        qDebug()<<"line "<<i<<QPoint(x-width,y-width + i)<<QPoint(x+width,y-width+i);
     }
-    painter->drawText(QPoint(x,y),toString());
+//    painter->drawText(QPoint(x,y),toString());
     /** 绘制控制点 **/
     if (isSelected()) {
 //		if (!e->isParentSelected()) {
@@ -172,4 +177,15 @@ void PF_Point::calculateBorders()
 QString PF_Point::toString() const
 {
     return data.pos.toString()+QString(" %1").arg(m_index);
+}
+
+QString PF_Point::toGeoString()
+{
+    //Point (11) = {0.032 *u, 0.031 *u, 0 *u, lc} ;
+    return QString("Point (%1) = {%2, %3, 0, 1e-1} ;").arg(m_index).arg(data.pos.x).arg(data.pos.y);
+}
+
+int PF_Point::index() const
+{
+    return m_index;
 }

@@ -1,39 +1,60 @@
-#ifndef PF_CIRCLE_H
-#define PF_CIRCLE_H
+#ifndef PF_FACE_H
+#define PF_FACE_H
 
 #include "pf_atomicentity.h"
-//2018-02-11
-//by Poofee
-/**圆**/
 
-struct PF_CircleData
-{
-    PF_CircleData()=default;
-    PF_CircleData(PF_Vector* center, double radius);
+class QPainterPath;
+class QPolygonF;
+class PF_Line;
+/*!
+ \brief 保存闭合的曲线数据
 
-    PF_Vector center;
-    double radius;
+*/
+class PF_LineLoop{
+public:
+    PF_LineLoop();
+
+    int index() const;
+    static int lineloop_index;
+    QList<PF_Line* > lines;/** 保存对应的点的编号 **/
+    QPolygonF loop;/** 保存所有的点，闭合模式 **/
+    int m_index;
 };
 
-class PF_Circle: public PF_AtomicEntity
+/*!
+ \brief 保存面的数据，在这里，面是由一些闭合
+ 多边形所构成的图形。一般的面可以用一个闭合多
+边形来表示，对于某些有孔或洞的面，采用多个闭合
+多边形来表示。
+
+*/
+class PF_FaceData{
+public:
+    PF_FaceData()=default;
+
+    PF_FaceData(const PF_FaceData& data);
+
+    PF_FaceData& operator=(const PF_FaceData& data);
+
+    QList<PF_LineLoop* > faceData;
+};
+
+/*!
+ \brief 产生绘制面的效果
+
+*/
+class PF_Face : public PF_AtomicEntity
 {
 public:
-    PF_Circle()=default;
-    PF_Circle(PF_EntityContainer* parent, PF_GraphicView* view, const PF_CircleData &d);
-    ~PF_Circle()=default;
+    PF_Face()=default;
+    PF_Face(PF_EntityContainer* parent, PF_GraphicView* view, const PF_FaceData &d);
+    PF_Face(PF_EntityContainer* parent, PF_GraphicView* view, const PF_FaceData &d,PF_Line* mouse);
+    ~PF_Face()=default;
 
-    /**	@return PF::EntityCircle */
+    /**	@return PF::EntityFace */
     PF::EntityType rtti() const override{
-        return PF::EntityCircle;
+        return PF::EntityFace;
     }
-    /** @return The center point (x) of this arc */
-    PF_Vector getCenter() const override;
-    /** Sets new center. */
-    void setCenter(const PF_Vector& c);
-    /** @return The radius of this arc */
-    double getRadius() const override;
-    /** Sets new radius. */
-    void setRadius(double r);
 
     /** 继承的虚函数 **/
     PF_VectorSolutions getRefPoints() const override;
@@ -73,8 +94,11 @@ public:
 
     QString toGeoString() override;
     int index() const override;
+
+    static int face_index;
 protected:
-    PF_CircleData data;
+    PF_FaceData data;
+    int m_index;
 };
 
-#endif // PF_CIRCLE_H
+#endif // PF_FACE_H

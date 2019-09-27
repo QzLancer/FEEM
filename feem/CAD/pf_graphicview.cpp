@@ -156,7 +156,7 @@ PF_GraphicView::PF_GraphicView(PF_Document *doc, QWidget *parent)
     这个窗口部件才会接收鼠标移动事件。**/
     setMouseTracking(true);
 
-    setDefaultSnapMode(PF_SnapMode());
+    //setDefaultSnapMode(PF_SnapMode());
 
 
     setAttribute(Qt::WA_NoMousePropagation);
@@ -2288,13 +2288,13 @@ void PF_GraphicView::zoomAuto(bool axis, bool keepAspectRatio)
                 xAxis->setRange(QCPRange(center.x-sx*0.505,center.x+sx*0.505));
                 yAxis->setRange(QCPRange(center.y-(sx/factor)*0.51,center.y+(sx/factor)*0.51));
             }else{
-                qDebug()<<"zoom in y direction";
+//                qDebug()<<"zoom in y direction";
                 yAxis->setRange(QCPRange(center.y-sy*0.505,center.y+sy*0.505));
                 xAxis->setRange(QCPRange(center.x-(sy*factor)*0.51,center.x+(sy*factor)*0.51));
             }
         }
 
-        qDebug()<<"sx,"<<sx<<"sy,"<<sy;
+//        qDebug()<<"sx,"<<sx<<"sy,"<<sy;
 
     }
     replot();

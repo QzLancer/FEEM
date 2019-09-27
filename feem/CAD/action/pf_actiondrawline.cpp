@@ -15,6 +15,10 @@ PF_ActionDrawLine::PF_ActionDrawLine(PF_EntityContainer *container, PF_GraphicVi
 {
     actionType = PF::ActionDrawLine;
     reset();
+    /** 设置捕捉模式 **/
+    this->snapMode.snapGrid = false;
+    this->snapMode.snapFree = false;
+    this->snapMode.snapEndpoint = true;
 }
 
 PF_ActionDrawLine::~PF_ActionDrawLine()
@@ -54,6 +58,11 @@ void PF_ActionDrawLine::trigger()
 void PF_ActionDrawLine::mouseMoveEvent(QMouseEvent *e)
 {
     PF_Vector mouse = snapPoint(e);
+    if(!mouse.valid)
+        return;
+    PF_Entity* entity = catchEntity(mouse,PF::EntityPoint);
+    if(!entity)
+        return;
 
 //    PF_CADWidget::statusbar->clearMessage();
     switch(getStatus()){
@@ -68,10 +77,10 @@ void PF_ActionDrawLine::mouseMoveEvent(QMouseEvent *e)
         break;
     }
     /**只有起始点设置好之后才有预览**/
-    if(getStatus() == SetEndpoint && data->startpoint.valid){
+    if(getStatus() == SetEndpoint && data->startpoint->getCenter().valid){
         deletePreview();
         view->setCurrentLayer(QLatin1String("overlay"));
-        PF_Line* line = new PF_Line(container,view,data->startpoint,mouse);
+        PF_Line* line = new PF_Line(container,view,data->startpoint,dynamic_cast<PF_Point*>(entity));
         view->setCurrentLayer(QLatin1String("main"));
         preview->addEntity(line);
         drawPreview();
@@ -82,17 +91,21 @@ void PF_ActionDrawLine::mouseReleaseEvent(QMouseEvent *e)
 {
     if(e->button() == Qt::LeftButton){
         PF_Vector mouse = snapPoint(e);
-
+        if(!mouse.valid)
+            return;
+        PF_Entity* entity = catchEntity(mouse,PF::EntityPoint);
+        if(!entity)
+            return;
         switch(getStatus()){
         case SetStartpoint:
-            data->startpoint = mouse;
+            data->startpoint = dynamic_cast<PF_Point*>(entity);
             //qDebug()<<"setstartpoint"<<mouse.x<<","<<mouse.y;
 
             setStatus(SetEndpoint);
             updateMouseButtonHints();
             break;
         case SetEndpoint:
-            data->endpoint = mouse;
+            data->endpoint = dynamic_cast<PF_Point*>(entity);
             trigger();
             break;
         default:

@@ -110,6 +110,13 @@ void PF_ActionFactory::fillActionContainer(QMap<QString, QAction*>& a_map, PF_Ac
     action->setObjectName("DeSelectAll");
     a_map["DeSelectAll"] = action;
 
+    /**导出geo文件**/
+    action = new QAction(tr("Export Geometry"), agm->file);
+    action->setIcon(QIcon(":/main/export.png"));
+    connect(action, SIGNAL(triggered()), action_handler, SLOT(slotExportGeoFile()));
+    action->setObjectName("Export Geometry");
+    a_map["ExportGeometry"] = action;
+
     /**画点**/
 	action = new QAction(tr("DrawPoint"), agm->file);
     action->setIcon(QIcon(":/main/dot.png"));
@@ -143,6 +150,13 @@ void PF_ActionFactory::fillActionContainer(QMap<QString, QAction*>& a_map, PF_Ac
     action->setObjectName("DrawRectangle");
     action->setIcon(QIcon(":/main/square.png"));
     a_map["DrawRectangle"] = action;
+
+    /**画闭合面**/
+    action = new QAction(tr("DrawFace"), agm->file);
+    connect(action, SIGNAL(triggered()), action_handler, SLOT(slotDrawFace()));
+    action->setObjectName("DrawFace");
+    action->setIcon(QIcon(":/main/square.png"));
+    a_map["DrawFace"] = action;
 
 	//View
 	action = new QAction(tr("ZoomIn"), agm->file);

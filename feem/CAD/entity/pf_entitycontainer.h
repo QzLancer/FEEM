@@ -7,6 +7,29 @@
 //2018-02-15
 //by Poofee
 /**该类实现entity的组合功能，也就是一个数组列表**/
+enum GmshElementType{
+    LINE_NODE2=1,
+    TRIANGLE_NODE3,
+    QUAD_NODE4
+};
+typedef struct _CNode
+{
+    double x, y, z;
+}CNode;
+
+typedef struct _CElement
+{
+    int n[3];// ni, nj, nk;//
+    int ele_type;
+    int physic_tag;
+    int geometry_tag;
+}CElement;
+typedef struct _CMesh{
+    int numNode;
+    int numEle;
+    CNode* nodes;
+    CElement* eles;
+}CMesh;
 
 class PF_EntityContainer: public PF_Entity
 {
@@ -23,6 +46,11 @@ public:
         return true;
     }
 
+    /** @return PF::EntityContainer */
+    PF::EntityType rtti() const override{
+        return PF::EntityContainer;
+    }
+
     unsigned count() const override;
 
     void setOwner(bool owner) {autoDelete=owner;}
@@ -37,7 +65,6 @@ public:
     virtual void insertEntity(int index, PF_Entity* entity);
     virtual bool removeEntity(PF_Entity* entity);
 
-    void addRectangle(PF_Vector const& v0, PF_Vector const& v1);
 
     /**一系列对Entity的操作**/
     PF_Vector getNearestEndpoint(const PF_Vector& coord,
@@ -107,6 +134,12 @@ public:
     QList<PF_Entity *>::iterator end() ;
 
     const QList<PF_Entity*>& getEntityList();
+
+    QString toGeoString() override;
+    bool exportGeofile();
+    void doMesh();
+    CMesh *loadGmsh22(const char fn[]);
+    int index() const override;
 protected:
     QList<PF_Entity*> entities;/**保存所有实体**/
 private:

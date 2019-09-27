@@ -1,9 +1,145 @@
 #include "pf_entitycontainer.h"
 #include "pf_graphicview.h"
 #include "pf_line.h"
+#include "gmsh.h"
+#include <stdio.h>
 
 #include <QDebug>
 
+int next_int(char **start)
+{
+    int i;
+    char *end;
+
+    i = strtol(*start,&end,10);
+    *start = end;
+    return(i);
+}
+/*!
+ \brief 读入msh2.2版本的分网文件，这个版本的格式比较容易读取。
+ 格式简要如下：
+$MeshFormat
+版本号（2.2） 文件类型（0代表ASCII文件） 数据大小
+$EndMeshFormat
+$Nodes
+节点数目
+节点编号 x y z
+...
+$EndNodes
+$Elements
+单元数目
+单元编号 单元类型 标签数 标签1（物理实体编号） 标签2（几何实体编号） ... 节点1 节点2 节点3 ...
+...
+$EndElements
+ \param mshFilename
+ \return bool
+*/
+CMesh* PF_EntityContainer::loadGmsh22(const char fn[]){
+    char *ch = (char *)calloc(256,sizeof (char));
+    //------------open file----------------------------------
+    FILE * fp = nullptr;
+    CElement *elementList = nullptr;
+    CNode *nodeList = nullptr;
+    CMesh* mesh = new CMesh;
+    fp = fopen(fn, "r");
+    if (fp == nullptr) {
+        qDebug() << "Error: openning file!";
+        return nullptr;
+    }
+    while(!feof(fp)){
+        fgets(ch, 256, fp);
+
+        if(strstr(ch,"$MeshFormat")){
+            double version;
+            int file_type;
+            int data_size;
+            if(fscanf(fp,"%lf %d %d\n",&version,&file_type,&data_size) != 3){
+                qDebug()<<"error reading format";
+                return nullptr;
+            }else{
+                qDebug()<<version<<file_type<<data_size;
+                if(version > 2.2){
+                    qDebug()<<"Can only open gmsh version 2.2 format";
+                    return nullptr;
+                }
+            }
+            fgets(ch, 256, fp);
+            if(!strstr(ch,"$EndMeshFormat")) {
+                printf("$MeshFormat section should end to string $EndMeshFormat:\n%s\n",ch);
+            }
+        }else if(strstr(ch,"$Nodes")){
+            int number_nodes;
+            if(fscanf(fp,"%d\n",&number_nodes) != 1)
+            {
+                return nullptr;
+            }else{
+                /**读取节点坐标**/
+                nodeList = (CNode *)malloc(number_nodes * sizeof (CNode));
+                mesh->numNode = number_nodes;
+                int index;
+                for(int i = 0;i < number_nodes;++i){
+                    fscanf(fp,"%d %lf %lf %lf\n",&index,&nodeList[i].x,&nodeList[i].y,&nodeList[i].z);
+                    //qDebug()<<index<<nodeList[i].x<<nodeList[i].y<<nodeList[i].z;
+                }
+            }
+            fgets(ch, 256, fp);
+            if(!strstr(ch,"$EndNodes")) {
+                printf("$Node section should end to string $EndNodes:\n%s\n",ch);
+            }
+        }else if(strstr(ch,"$Elements")){
+            int number_ele;
+            int ele_number;
+            //    int elm_type;
+            int number_of_tags;
+            char * chtmp;
+            if(fscanf(fp,"%d\n",&number_ele) != 1){
+                return nullptr;
+            }else{
+                elementList = (CElement *)calloc(number_ele, sizeof (CElement));
+                mesh->numEle = number_ele;
+                for(int i = 0;i < number_ele;++i){
+                    chtmp = fgets(ch, 256, fp);
+                    ele_number = next_int(&chtmp);
+                    elementList[i].ele_type = next_int(&chtmp);
+                    number_of_tags = next_int(&chtmp);
+                    elementList[i].physic_tag = next_int(&chtmp);
+                    elementList[i].geometry_tag = next_int(&chtmp);
+
+                    int element_nodes = 0;
+                    switch (elementList[i].ele_type) {
+                    case 15:
+                        element_nodes = 1;
+                        break;
+                    case 1:
+                        element_nodes = 2;
+                        break;
+                    case 2:
+                        element_nodes = 3;
+                        break;
+                    default:
+                        element_nodes = 0;
+                        break;
+                    }
+
+                    for(int j = 0; j < element_nodes;++j)
+                        elementList[i].n[j] = next_int(&chtmp)-1;
+//                    qDebug()<<elementList[i].geometry_tag<<elementList[i].physic_tag
+//                           <<elementList[i].n[0]<<elementList[i].n[1]<<elementList[i].n[2];
+
+                }
+            }
+            fgets(ch, 256, fp);
+            if(!strstr(ch,"$EndElements")) {
+                printf("$Element section should end to string $EndElements:\n%s\n",ch);
+            }
+        }
+    }
+
+    mesh->nodes = nodeList;
+    mesh->eles = elementList;
+    fclose(fp);
+    return mesh;
+}
 PF_EntityContainer::PF_EntityContainer(PF_EntityContainer *parent, PF_GraphicView *view, bool owner)
     :PF_Entity(parent,view)
 {
@@ -160,19 +296,7 @@ bool PF_EntityContainer::removeEntity(PF_Entity *entity)
 }
 
 
-/**
- * @brief 在实体当中添加一个矩形
- *
- * @param corner1
- * @param corner2
- */
-void PF_EntityContainer::addRectangle(const PF_Vector &corner1, const PF_Vector &corner2)
-{
-    addEntity(new PF_Line{this,mParentPlot, corner1, {corner2.x, corner1.y}});
-    addEntity(new PF_Line{this,mParentPlot, {corner2.x, corner1.y}, corner2});
-    addEntity(new PF_Line{this,mParentPlot, corner2, {corner1.x, corner2.y}});
-    addEntity(new PF_Line{this,mParentPlot, {corner1.x, corner2.y}, corner1});
-}
+
 
 void PF_EntityContainer::draw(QCPPainter *painter)
 {
@@ -181,8 +305,15 @@ void PF_EntityContainer::draw(QCPPainter *painter)
         return;
     }
 
+    /** 有些东西适合绘制在顶层，有些适合绘制在底层，先画面，
+        再画线，最后画点**/
     for(int i=0;i < entities.size();++i){
-        mParentPlot->drawEntity(painter,entities.at(i));
+
+            mParentPlot->drawEntity(painter,entities.at(i));
+    }
+    for(int i=0;i < entities.size();++i){
+        if(entities.at(i)->rtti() != PF::EntityFace)
+            mParentPlot->drawEntity(painter,entities.at(i));
     }
 }
 
@@ -701,4 +832,84 @@ QList<PF_Entity *>::iterator PF_EntityContainer::end()
 const QList<PF_Entity*>& PF_EntityContainer::getEntityList()
 {
     return entities;
+}
+
+QString PF_EntityContainer::toGeoString()
+{
+    return "";
+}
+
+/*!
+ \brief 将实体导出为geo格式
+
+ \return bool
+*/
+bool PF_EntityContainer::exportGeofile()
+{
+    QStringList qstrList;
+
+    QFile file("D:/model.geo");
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+    /** 导出所有的点 **/
+    for(auto e:entities){
+        if(e->rtti() == PF::EntityPoint && e->isVisible()){
+            out<<e->toGeoString()<<"\n";
+        }
+    }
+    /** 导出所有的线段 **/
+    for(auto e:entities){
+        if(e->rtti() == PF::EntityLine && e->isVisible()){
+            out<<e->toGeoString()<<"\n";
+        }
+    }
+    /** 导出所有的面 **/
+    for(auto e:entities){
+        if(e->rtti() == PF::EntityFace && e->isVisible()){
+//            qDebug()<<"export face";
+            out<<e->toGeoString()<<"\n";
+        }
+    }
+
+    file.flush();
+    file.close();
+    return true;
+}
+
+void PF_EntityContainer::doMesh()
+{
+    exportGeofile();
+    int myargn = 3;
+    char *myargv[] = {(char*)"gmsh",(char*)"-format",(char*)"msh2"};
+    gmsh::initialize(myargn,myargv);
+    gmsh::option::setNumber("General.Terminal", 1);
+    gmsh::open("D:/model.geo");
+    gmsh::model::mesh::generate(2);
+    gmsh::write("D:/model.msh");
+    CMesh* mesh = loadGmsh22("D:/model.msh");
+    PF_Point** points = (PF_Point**)malloc(mesh->numNode * sizeof (PF_Point*));
+    for(int i = 0;i < mesh->numNode;++i){
+        double x = mesh->nodes[i].x;
+        double y = mesh->nodes[i].y;
+        points[i] = new PF_Point(this,this->mParentPlot,PF_PointData(PF_Vector(x,y)));
+        this->addEntity(points[i]);
+    }
+    for(int i = 0;i < mesh->numEle;++i){
+        if(mesh->eles[i].ele_type == TRIANGLE_NODE3){
+            int n0 = mesh->eles[i].n[0];
+            int n1 = mesh->eles[i].n[1];
+            int n2 = mesh->eles[i].n[2];
+            this->addEntity(new PF_Line(this,this->mParentPlot,points[n0],points[n1]));
+            this->addEntity(new PF_Line(this,this->mParentPlot,points[n1],points[n2]));
+            this->addEntity(new PF_Line(this,this->mParentPlot,points[n2],points[n0]));
+
+        }
+    }
+    this->mParentPlot->replot();
+    gmsh::finalize();
+}
+
+int PF_EntityContainer::index() const
+{
+    return 0;
 }

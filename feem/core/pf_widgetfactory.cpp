@@ -282,7 +282,8 @@ void PF_WidgetFactory::createGroupImExportGeometry(RibbonPage *page)
     if(Qtitan::RibbonGroup* groupImExport = page->addGroup(QIcon(":/main/project.png"), tr("Import/Export")))
     {
         groupImExport->addAction(QIcon(":/main/import.png"), tr("Import Geometry"), Qt::ToolButtonTextUnderIcon);
-        groupImExport->addAction(QIcon(":/main/export.png"), tr("Export Geometry"), Qt::ToolButtonTextUnderIcon);
+//        groupImExport->addAction(QIcon(":/main/export.png"), tr("Export Geometry"), Qt::ToolButtonTextUnderIcon);
+        groupImExport->addAction(a_map["ExportGeometry"],Qt::ToolButtonTextUnderIcon);
     }
 }
 
@@ -310,6 +311,7 @@ void PF_WidgetFactory::createGroupDraw(RibbonPage *page)
     {
         groupDraw->addAction(a_map["DrawPoint"], Qt::ToolButtonTextUnderIcon);
         groupDraw->addAction(a_map["DrawLine"], Qt::ToolButtonTextUnderIcon);
+        groupDraw->addAction(a_map["DrawFace"], Qt::ToolButtonTextUnderIcon);
 
         QMenu* menuSquare = new QMenu(mainwindow);
 
@@ -379,7 +381,7 @@ void PF_WidgetFactory::createGroupBuildMesh(RibbonPage *page)
 {
     if(Qtitan::RibbonGroup* groupBuildMesh = page->addGroup(QIcon(":/main/project.png"), tr("BuildMesh")))
     {
-        groupBuildMesh->addAction(QIcon(":/main/buildmesh.png"), tr("Build mesh"), Qt::ToolButtonTextUnderIcon);
+        groupBuildMesh->addAction(a_map["DoMesh"], Qt::ToolButtonTextUnderIcon);
     }
 }
 
