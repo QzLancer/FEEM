@@ -118,6 +118,15 @@ void TargetWidget::slotChangeData(const QModelIndex &topleft, const QModelIndex 
 void TargetWidget::slotDeleteTableItem()
 {
     qDebug() << "TargetWidget::slotDeleteTableItem";
+    QModelIndex index = mTargetTable->currentIndex();
+//    qDebug() << index;
+    if(index.row() != -1){
+        int row = index.row();
+        QString key = mTargetModel->item(row, 0)->text();
+//        mTargetModel->removeRow(row);
+        mTargetModeMap.remove(key);
+        refreshTable();
+    }
 }
 
 void TargetWidget::setWarning(QString string)

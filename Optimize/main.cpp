@@ -10,15 +10,15 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    //    单目标优化dialog测试
-    //    SingleObjectDialog w;
-    //    QStringList InputList;
-    //    QStringList TargetList;
-    //    InputList << "Input1" << "Input2" << "Input3";
-    //    TargetList << "Target1" << "Target2" << "Target3" << "Target4";
-    //    w.setInputList(InputList);
-    //    w.setTargetList(TargetList);
-    //    w.show();
+//        单目标优化dialog测试
+        SingleObjectDialog w;
+        QStringList InputList;
+        QStringList TargetList;
+        InputList << "Input1" << "Input2" << "Input3";
+        TargetList << "Target1" << "Target2" << "Target3" << "Target4";
+        w.setInputList(InputList);
+        w.setTargetList(TargetList);
+        w.show();
 
     //    //单目标优化core测试
     //    double lower[2] = { -2, -2 };//Maxmum of imput parameters
@@ -44,9 +44,9 @@ int main(int argc, char *argv[])
 
     //多目标优化dialog测试
     MultiObjectDialog md;
-    QStringList InputList, TargetList;
-    InputList << "Input1" << "Input2" << "Input3";
-    TargetList << "Target1" << "Target2" << "Target3" << "Target4";
+//    QStringList InputList, TargetList;
+//    InputList << "Input1" << "Input2" << "Input3";
+//    TargetList << "Target1" << "Target2" << "Target3" << "Target4";
     md.setInputList(InputList);
     md.setTargetList(TargetList);
     md.show();

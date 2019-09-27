@@ -138,7 +138,14 @@ void InputParamWidget::slotChangeData(const QModelIndex &topleft, const QModelIn
 void InputParamWidget::slotDeleteTableItem()
 {
     qDebug() << "InputParamWidget::slotDeleteTableItem";
-
+    QModelIndex index = mInputTable->currentIndex();
+//    qDebug() << index;
+    if(index.row() != -1){
+        int row = index.row();
+        mInputParamName.removeAt(row);
+        mInputValue.removeAt(row);
+        refreshTable();
+    }
 }
 
 void InputParamWidget::refreshTable()
