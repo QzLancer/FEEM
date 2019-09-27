@@ -32,7 +32,8 @@ SOURCES += \
     singleobjectcore/particle.cpp \
     inputparamwidget.cpp \
     targetwidget.cpp \
-    itemdelegate.cpp
+    itemdelegate.cpp \
+    readonlydelegate.cpp
 
 HEADERS += \
     singleobjectdialog.h \
@@ -41,7 +42,8 @@ HEADERS += \
     singleobjectcore/particle.h \
     inputparamwidget.h \
     targetwidget.h \
-    itemdelegate.h
+    itemdelegate.h \
+    readonlydelegate.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

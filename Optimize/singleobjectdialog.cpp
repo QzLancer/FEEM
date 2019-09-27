@@ -58,6 +58,7 @@ void SingleObjectDialog::initialize()
     QPalette pe;
     pe.setColor(QPalette::WindowText, Qt::red);
     mWarningLabel1->setPalette(pe);
+
     hlayout1->addWidget(mWarningLabel1);
     hlayout1->addStretch();
     hlayout1->addWidget(buttonoptimize);

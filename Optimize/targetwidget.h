@@ -46,7 +46,6 @@ private:
     QPushButton *mTargetDeleteButton;
     QPushButton *mTargetAddButton;
     QLabel *mTargetWarningLabel;
-    ItemDelegate *mItemDelegate;
 
     //ComboBox中的列表
     QStringList mTargetList;

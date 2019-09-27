@@ -3,6 +3,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QDebug>
+#include "readonlydelegate.h"
 
 TargetWidget::TargetWidget(QWidget *parent)
     : QWidget(parent),
@@ -13,9 +14,7 @@ TargetWidget::TargetWidget(QWidget *parent)
       mModeBox(new QComboBox(this)),
       mTargetDeleteButton(new QPushButton(tr("Delete"), this)),
       mTargetAddButton(new QPushButton(tr("Add"), this)),
-      mTargetWarningLabel(new QLabel(this)),
-      mItemDelegate(new ItemDelegate(this))
-
+      mTargetWarningLabel(new QLabel(this))
 {
     QPalette pe;
     pe.setColor(QPalette::WindowText, Qt::red);
@@ -33,7 +32,15 @@ TargetWidget::TargetWidget(QWidget *parent)
     QStringList inputlist;
     inputlist << tr("Target to be optimized") << tr("Optimize mode");
     mTargetModel->setHorizontalHeaderLabels(inputlist);
-    mTargetTable->setItemDelegateForColumn(1, mItemDelegate);
+
+    //委托构造
+    ItemDelegate *itemdelegate = new ItemDelegate(this);
+    mTargetTable->setItemDelegateForColumn(1, itemdelegate);
+    ReadOnlyDelegate *readonlydelegate = new ReadOnlyDelegate(this);
+    mTargetTable->setItemDelegateForColumn(0, readonlydelegate);
+
+
+    //表头设置
     mTargetTable->resizeColumnsToContents();
     QStringList modelist;
     modelist << tr("Maximize") << tr("Minimize");
@@ -127,4 +134,5 @@ void TargetWidget::refreshTable()
         mTargetModel->setItem(count, 1, new QStandardItem(i.value()));
         ++count;
     }
+    mTargetTable->resizeColumnsToContents();
 }
