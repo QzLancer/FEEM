@@ -14,13 +14,13 @@ SingleObjectDialog::SingleObjectDialog(QWidget *parent)
       mGroup2(new QGroupBox(this)),
       mTargetBox(new QComboBox(mGroup1)),
       mModeBox(new QComboBox(mGroup1)),
-      mSizeEdit(new QLineEdit(mGroup2)),
-      mTimeEdit(new QLineEdit(mGroup2)),
-      mRateEdit(new QLineEdit(mGroup2)),
-      mWUpperEdit(new QLineEdit(mGroup2)),
-      mWLowerEdit(new QLineEdit(mGroup2)),
-      mC1Edit(new QLineEdit(mGroup2)),
-      mC2Edit(new QLineEdit(mGroup2)),
+      mSizeEdit(new QLineEdit("50", mGroup2)),
+      mTimeEdit(new QLineEdit("500", mGroup2)),
+      mRateEdit(new QLineEdit("0.1", mGroup2)),
+      mWLowerEdit(new QLineEdit("0.4", mGroup2)),
+      mWUpperEdit(new QLineEdit("0.9", mGroup2)),
+      mC1Edit(new QLineEdit("2", mGroup2)),
+      mC2Edit(new QLineEdit("2", mGroup2)),
       mWarningLabel1(new QLabel(mGroup2)),
       mInputWidget(new InputParamWidget(mGroup1))
 {
@@ -118,6 +118,7 @@ void SingleObjectDialog::slotOptimize()
         double *lower = new double[static_cast<unsigned long long>(InputValue.size())];
         double *upper = new double[static_cast<unsigned long long>(InputValue.size())];
         double *vmax = new double[static_cast<unsigned long long>(InputValue.size())]; //粒子最大速度
+        mInputName = mInputWidget->getInputName();
         for(int i = 0; i < InputValue.size(); ++i){
             lower[i] = InputValue[i][0];
             upper[i] = InputValue[i][1];
@@ -199,13 +200,13 @@ void SingleObjectDialog::initializeGroup2()
     QLabel *ratelabel = new QLabel(tr("Mutation rate: "), mGroup2);
     QLineEdit *rateedit = mRateEdit;
 
-    //w上界
-    QLabel *wupperlabel = new QLabel(tr("Upper weight: "), mGroup2);
-    QLineEdit *wupperedit = mWUpperEdit;
-
     //w下界
     QLabel *wlowerlabel = new QLabel(tr("Lower weight: "), mGroup2);
     QLineEdit *wloweredit = mWLowerEdit;
+
+    //w上界
+    QLabel *wupperlabel = new QLabel(tr("Upper weight: "), mGroup2);
+    QLineEdit *wupperedit = mWUpperEdit;
 
     //c1
     QLabel *c1label = new QLabel(tr("c1: "), mGroup2);
@@ -261,12 +262,12 @@ bool SingleObjectDialog::isParamError()
         mWarningLabel1->setText(tr("Error: Mutation rate must be a number!"));
         return false;
     }
-    if(!isWUpperDouble){
-        mWarningLabel1->setText(tr("Error: Upper weight must be a number!"));
-        return false;
-    }
     if(!isWLowerDouble){
         mWarningLabel1->setText(tr("Erorr: Lower weight must be a number!"));
+        return false;
+    }
+    if(!isWUpperDouble){
+        mWarningLabel1->setText(tr("Error: Upper weight must be a number!"));
         return false;
     }
     if(!isC1Double){

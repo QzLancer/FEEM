@@ -23,6 +23,7 @@ PSO::PSO(int _numberOfParticles,
 	double _c1,
 	double _c2,
 	double _vari,
+    QStringList _optimizeMode,
     QString _stoppingCriteria,
     QString _psoType)
 {
@@ -54,7 +55,8 @@ PSO::PSO(int _numberOfParticles,
 		_vmax,
 		_c1, _c2,
 		&weight, &vari,
-        _objectiveFunction);
+        _objectiveFunction,
+        _optimizeMode);
 	//初始化一个精英粒子矩阵大小为两倍的精英种群数目
 	extraParticles = new Particle *[2 * numberOfExtraParticles];
 	//初始化一个精英粒子群
@@ -65,7 +67,8 @@ PSO::PSO(int _numberOfParticles,
 		_vmax,
 		_c1, _c2,
 		&weight, &vari,
-		_objectiveFunction);
+        _objectiveFunction,
+        _optimizeMode);
 
 	//tempParticle = new Particle(_numberOfVariables, _numberOfObjectives,
 	//	_lowerBounds,

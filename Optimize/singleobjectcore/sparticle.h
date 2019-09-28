@@ -8,7 +8,14 @@ public:
     SParticle();
 
     //Class constructor
-    SParticle (int, const double *, const double *, const double *, double , double , const double *, void (*)(SParticle *), QString);
+    SParticle(int _numberOfVariables,
+                    const double *_lowerBounds,
+                    const double *_upperBounds,
+                    const double *_vmax,
+                    double _c1, double _c2,
+                    const double *_weight,
+                    void (*_functionPtr)(SParticle *),
+                    QString _optimizemode);
 
     ~SParticle ();
 

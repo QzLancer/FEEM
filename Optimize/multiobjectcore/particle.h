@@ -1,8 +1,19 @@
+#include <QStringList>
+
 class Particle
 {
 public:
 	//构造函数
-	Particle(int, int, const double *, const double *, const double *, double, double, const double *, const double *,void(*)(Particle *));
+    Particle(int _numberOfVariables,
+        int _numberOfObjectives,
+        const double *_lowerBounds,
+        const double *_upperBounds,
+        const double *_vmax,
+        double _c1, double _c2,
+        const double *_weight,
+        const double *_vari,
+        void(*_functionPtr)(Particle *),
+        QStringList _optimizeMode);
 	//赋值运算符重载
 	Particle& operator =(const Particle& str);
 	//复制构造函数
@@ -97,6 +108,8 @@ private:
 	static void(*functionPtr) (Particle *);
 	//更新最佳粒子
 	void updateParticleBest();
+
+    QStringList optimizeMode;
 };
 
 

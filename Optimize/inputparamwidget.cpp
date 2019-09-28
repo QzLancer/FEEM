@@ -64,6 +64,11 @@ QList<QList<double> > InputParamWidget::getInputValue() const
     return mInputValue;
 }
 
+QStringList InputParamWidget::getInputName() const
+{
+    return mInputParamName;
+}
+
 void InputParamWidget::setWarning(QString string)
 {
     mWarningLabel->setText(string);
@@ -138,6 +143,7 @@ void InputParamWidget::slotChangeData(const QModelIndex &topleft, const QModelIn
 void InputParamWidget::slotDeleteTableItem()
 {
     qDebug() << "InputParamWidget::slotDeleteTableItem";
+    disconnect(mInputModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(slotChangeData(QModelIndex,QModelIndex,QVector<int>)));
     QModelIndex index = mInputTable->currentIndex();
 //    qDebug() << index;
     if(index.row() != -1){
@@ -146,6 +152,7 @@ void InputParamWidget::slotDeleteTableItem()
         mInputValue.removeAt(row);
         refreshTable();
     }
+     connect(mInputModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(slotChangeData(QModelIndex,QModelIndex,QVector<int>)));
 }
 
 void InputParamWidget::refreshTable()

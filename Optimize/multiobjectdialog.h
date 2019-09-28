@@ -46,10 +46,16 @@ private:
     QLineEdit *mTimeEdit;
     QLineEdit *mEliteEdit;
     QLineEdit *mRateEdit;
-    QLineEdit *mWUpperEdit;
     QLineEdit *mWLowerEdit;
+    QLineEdit *mWUpperEdit;
     QLineEdit *mC1Edit;
     QLineEdit *mC2Edit;
+
+    QStringList mTargetName;
+    QStringList mInputName;
+
+    //求解器
+    static void objectiveFunction(Particle *Particle);
 };
 
 #endif // MULTIOBJECTDIALOG_H

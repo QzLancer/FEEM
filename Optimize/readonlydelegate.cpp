@@ -8,5 +8,5 @@ ReadOnlyDelegate::ReadOnlyDelegate(QObject *parent)
 
 QWidget *ReadOnlyDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    return NULL;
+    return nullptr;
 }

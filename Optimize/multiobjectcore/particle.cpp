@@ -3,6 +3,8 @@
 #include <cstdio>
 #include <iostream>
 #include <exception>
+#include <QObject>
+#include <QDebug>
 
 using namespace std;
 
@@ -32,8 +34,11 @@ Particle::Particle(int _numberOfVariables,
 	double _c1, double _c2,
 	const double *_weight, 
 	const double *_vari,
-	void(*_functionPtr)(Particle *))
+    void(*_functionPtr)(Particle *),
+    QStringList _optimizeMode)
 {
+    optimizeMode = _optimizeMode;
+
 	lowerBounds = _lowerBounds;
 	upperBounds = _upperBounds;
 
@@ -244,8 +249,20 @@ const double *Particle::getValue()
 
 void Particle::setValue(const double *_value)
 {
-	for (int i = 0; i < numberOfObjectives; i++)
-		value[i] = _value[i];
+//    for (int i = 0; i < numberOfObjectives; i++){
+//        if(optimizeMode[i] == QObject::tr("Maximize")){
+//            value[i] = _value[i];
+//        }
+//        else if(optimizeMode[i] == QObject::tr("Minimize")){
+//            value[i] = 1/_value[i];
+//        }
+//        else{
+//            qDebug() << "Error: Particle::setValue!";
+//        }
+//    }
+    for(int i = 0; i < numberOfObjectives; ++i){
+        value[i] = _value[i];
+    }
 }
 
 void Particle::setConstraits(double _constraits)

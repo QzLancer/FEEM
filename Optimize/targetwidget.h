@@ -18,6 +18,7 @@ public:
     //getter
     QStringList getTargetList() const;
     QStringList getModeList() const;
+    QMap<QString, QString> getTargetModeMap() const;
     //setter
     void setTargetList(QStringList targetlist);
     void setModeList(QStringList modelist);

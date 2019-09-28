@@ -51,13 +51,14 @@ private:
     QLineEdit *mSizeEdit;
     QLineEdit *mTimeEdit;
     QLineEdit *mRateEdit;
-    QLineEdit *mWUpperEdit;
     QLineEdit *mWLowerEdit;
+    QLineEdit *mWUpperEdit;
     QLineEdit *mC1Edit;
     QLineEdit *mC2Edit;
     QLabel *mWarningLabel1;
 
     InputParamWidget *mInputWidget;
+    QStringList mInputName;
     //求解器
     static void objectiveFunction (SParticle *Particle);
 };

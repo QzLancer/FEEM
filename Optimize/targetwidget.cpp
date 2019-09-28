@@ -42,9 +42,9 @@ TargetWidget::TargetWidget(QWidget *parent)
 
     //表头设置
     mTargetTable->resizeColumnsToContents();
-    QStringList modelist;
-    modelist << tr("Maximize") << tr("Minimize");
-    mModeBox->addItems(modelist);
+    QStringList modeist;
+    modeist << tr("Maximize") << tr("Minimize");
+    mModeBox->addItems(modeist);
 
     //layout
     QGridLayout *glayout = new QGridLayout;
@@ -82,6 +82,11 @@ QStringList TargetWidget::getModeList() const
     return mModeList;
 }
 
+QMap<QString, QString> TargetWidget::getTargetModeMap() const
+{
+    return mTargetModeMap;
+}
+
 void TargetWidget::setTargetList(QStringList targetlist)
 {
     mTargetList = targetlist;
@@ -91,7 +96,7 @@ void TargetWidget::setTargetList(QStringList targetlist)
 void TargetWidget::setModeList(QStringList modelist)
 {
     mModeList = modelist;
-    mTargetBox->addItems(mModeList);
+    mModeBox->addItems(mModeList);
 }
 
 void TargetWidget::slotAddTableItem()
@@ -123,6 +128,7 @@ void TargetWidget::slotChangeData(const QModelIndex &topleft, const QModelIndex 
 void TargetWidget::slotDeleteTableItem()
 {
     qDebug() << "TargetWidget::slotDeleteTableItem";
+    disconnect(mTargetModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(slotChangeData(QModelIndex,QModelIndex,QVector<int>)));
     QModelIndex index = mTargetTable->currentIndex();
 //    qDebug() << index;
     if(index.row() != -1){
@@ -132,6 +138,7 @@ void TargetWidget::slotDeleteTableItem()
         mTargetModeMap.remove(key);
         refreshTable();
     }
+    connect(mTargetModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(slotChangeData(QModelIndex,QModelIndex,QVector<int>)));
 }
 
 void TargetWidget::setWarning(QString string)

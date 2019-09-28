@@ -7,6 +7,8 @@
 #include <QGridLayout>
 #include <QTableView>
 #include <QDebug>
+#include <QStringList>
+
 MultiObjectDialog::MultiObjectDialog(QWidget *parent)
     : QDialog (parent),
       mGroup1(new QGroupBox(this)),
@@ -14,14 +16,14 @@ MultiObjectDialog::MultiObjectDialog(QWidget *parent)
       mInputWidget(new InputParamWidget(mGroup1)),
       mTargetWidget(new TargetWidget(mGroup1)),
       mWarningLabel(new QLabel(mGroup2)),
-      mSizeEdit(new QLineEdit(mGroup2)),
-      mTimeEdit(new QLineEdit(mGroup2)),
-      mEliteEdit(new QLineEdit(mGroup2)),
-      mRateEdit(new QLineEdit(mGroup2)),
-      mWUpperEdit(new QLineEdit(mGroup2)),
-      mWLowerEdit(new QLineEdit(mGroup2)),
-      mC1Edit(new QLineEdit(mGroup2)),
-      mC2Edit(new QLineEdit(mGroup2))
+      mSizeEdit(new QLineEdit("50", mGroup2)),
+      mTimeEdit(new QLineEdit("100", mGroup2)),
+      mEliteEdit(new QLineEdit("50", mGroup2)),
+      mRateEdit(new QLineEdit("0.1", mGroup2)),
+      mWLowerEdit(new QLineEdit("0.3", mGroup2)),
+      mWUpperEdit(new QLineEdit("0.4", mGroup2)),
+      mC1Edit(new QLineEdit("1.5", mGroup2)),
+      mC2Edit(new QLineEdit("1.5", mGroup2))
 {
     initialize();
 }
@@ -103,7 +105,57 @@ void MultiObjectDialog::slotOptimize()
 {
     qDebug() << "MultiObjectDialog::slotOptimize";
     if(isParamError()){
+        qDebug() << "Input parameter OK!";
+        //optimize mode
+        QStringList TargetMode;
+        QMap<QString, QString> TargetModeMap = mTargetWidget->getTargetModeMap();
+        for(auto iter = TargetModeMap.begin(); iter != TargetModeMap.end(); ++iter){
+            qDebug() << iter.key() << iter.value();
+            mTargetName.append(iter.key());
+            TargetMode.append(iter.value());
+        }
+        mInputName = mInputWidget->getInputName();
+        //将input parameter转换成可以传递的形式
+        QList<QList<double>> InputValue = mInputWidget->getInputValue();
+        double *lower = new double[static_cast<unsigned long long>(InputValue.size())];
+        double *upper = new double[static_cast<unsigned long long>(InputValue.size())];
+        double *vmax = new double[static_cast<unsigned long long>(InputValue.size())]; //粒子最大速度
+        for(int i = 0; i < InputValue.size(); ++i){
+            lower[i] = InputValue[i][0];
+            upper[i] = InputValue[i][1];
+            vmax[i] = 0.5;
+        }
+        //读取各个lineedit中的数据，目前变异概率不使用
+        int numberOfParticles = mSizeEdit->text().toInt();
+        int numberOfExtraParticles = mEliteEdit->text().toInt();
+        int numberOfVariables = InputValue.size();
+        int numberOfObjectives = TargetMode.size();
+        int maxIteration = mTimeEdit->text().toInt();
+        double lowerWeight = mWLowerEdit->text().toDouble();
+        double upperWeight = mWUpperEdit->text().toDouble();
+        double c1 = mC1Edit->text().toDouble();
+        double c2 = mC2Edit->text().toDouble();
+        QString stoppingCriteria = "none";
+        QString psoType = "Classic";
+        double vari = 0.05;
 
+        //观察输入参数
+        qDebug() << "lower: " << lower[0] << lower[1];
+        qDebug() << "upper: " << upper[0] << upper[1];
+        qDebug() << "vmax: " << vmax[0] << vmax[1];
+        qDebug() << "numberOfParticles: " << numberOfParticles;
+        qDebug() << "numberOfExtraParticles: " << numberOfExtraParticles;
+        qDebug() << "numberOfVariables: " << numberOfVariables;
+        qDebug() << "numberOfobjectives: " << numberOfObjectives;
+        qDebug() << "maxIteration: " << maxIteration;
+        qDebug() << "lowerWeight: " << lowerWeight;
+        qDebug() << "upperWeight: " << upperWeight;
+        qDebug() << "c1: " << c1;
+        qDebug() << "c2: " << c2;
+
+        PSO pso(numberOfParticles, numberOfVariables, numberOfObjectives, numberOfExtraParticles, lower, upper, vmax, MultiObjectDialog::objectiveFunction, lowerWeight, upperWeight, maxIteration, c1, c2, vari, TargetMode, stoppingCriteria, psoType);
+        pso.optimize();
+        pso.printBest();
     }
 }
 
@@ -139,13 +191,13 @@ void MultiObjectDialog::initializeGroup2()
     QLabel *ratelabel = new QLabel(tr("Mutation rate: "), mGroup2);
     QLineEdit *rateedit = mRateEdit;
 
-    //w上界
-    QLabel *wupperlabel = new QLabel(tr("Upper weight"), mGroup2);
-    QLineEdit *wupperedit = mWUpperEdit;
-
     //w下界
     QLabel *wlowerlabel = new QLabel(tr("Lower weight: "), mGroup2);
     QLineEdit *wloweredit = mWLowerEdit;
+
+    //w上界
+    QLabel *wupperlabel = new QLabel(tr("Upper weight"), mGroup2);
+    QLineEdit *wupperedit = mWUpperEdit;
 
     //c1
     QLabel *c1label = new QLabel(tr("c1: "), mGroup2);
@@ -207,12 +259,12 @@ bool MultiObjectDialog::isParamError()
         mWarningLabel->setText(tr("Error: Mutation rate must be a number!"));
         return false;
     }
-    if(!isWUpperDouble){
-        mWarningLabel->setText(tr("Error: Upper weight must be a number!"));
-        return false;
-    }
     if(!isWLowerDouble){
         mWarningLabel->setText(tr("Erorr: Lower weight must be a number!"));
+        return false;
+    }
+    if(!isWUpperDouble){
+        mWarningLabel->setText(tr("Error: Upper weight must be a number!"));
         return false;
     }
     if(!isC1Double){
@@ -223,8 +275,24 @@ bool MultiObjectDialog::isParamError()
         mWarningLabel->setText(tr("Error: C2 must be a number!"));
         return false;
     }
-    if(size <= elite){
-        mWarningLabel->setText(tr("Error: The number of elite particle must be not more than Number of particles!"));
-    }
     return true;
+}
+
+void MultiObjectDialog::objectiveFunction(Particle *Particle)
+{
+    const double *_position = Particle->getPosition();
+    int numberOfObjectives = Particle->getNumberOfObjective();
+    double *Objective;
+    Objective = new double [numberOfObjectives];
+    int _constraits;
+
+    Objective[0] = _position[0] * _position[0] + _position[1] * _position[1];
+    Objective[1] = (1 - _position[0]) * (1 - _position[0]) + (1 - _position[1]) * (1 - _position[1]);
+
+    Particle->setValue(Objective);
+    _constraits = 0;
+    Particle->setConstraits(_constraits);
+    Particle->setFeasible(_constraits ? false : true);
+    delete[] Objective;
+    return;
 }

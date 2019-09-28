@@ -17,7 +17,12 @@ class InputParamWidget : public QWidget
     Q_OBJECT
 public:
     explicit InputParamWidget(QWidget *parent = nullptr);
+
+    //getter
     QList<QList<double>> getInputValue() const;
+    QStringList getInputName() const;
+
+    //setter
     void setWarning(QString string);
     void setInputList(QStringList inputlist);
 

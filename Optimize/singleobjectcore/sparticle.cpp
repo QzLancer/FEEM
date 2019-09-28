@@ -140,7 +140,7 @@ void SParticle::setValue (double _value)
     if(optimizemode == QObject::tr("Maximize")){
         value = _value;
     }
-    else if(optimizemode == QObject::tr("Maximize")){
+    else if(optimizemode == QObject::tr("Minimize")){
         value = 1/_value;
     }
     else{
