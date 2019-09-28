@@ -7,6 +7,7 @@
 #include <QLineEdit>
 #include "inputparamwidget.h"
 #include "targetwidget.h"
+#include "multiobjectcore/pso.h"
 
 class MultiObjectDialog : public QDialog
 {

@@ -2,7 +2,7 @@
 #include "singleobjectdialog.h"
 #include "multiobjectdialog.h"
 #include <QString>
-#include <singleobjectcore/pso.h>
+#include <singleobjectcore/spso.h>
 //void objectiveFunction (Particle *Particle);
 #include "inputparamwidget.h"
 

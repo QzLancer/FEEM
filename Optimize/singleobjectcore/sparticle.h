@@ -1,16 +1,16 @@
 #ifndef PARTICLE_H
 #define PARTICLE_H
+#include <QString>
 
-
-class Particle
+class SParticle
 {
 public:
-    Particle();
+    SParticle();
 
     //Class constructor
-    Particle (int, const double *, const double *, const double *, double , double , const double *, void (*)(Particle *));
+    SParticle (int, const double *, const double *, const double *, double , double , const double *, void (*)(SParticle *), QString);
 
-    ~Particle ();
+    ~SParticle ();
 
     //Inicialize particle position, velocity, value, bestPosition,
     //bestValue and feasible
@@ -85,7 +85,9 @@ private:
 
     //pointer to the objective function
     //returns the feasibility of the particle
-    static void (*functionPtr) (Particle *);
+    static void (*functionPtr) (SParticle *);
+
+    QString optimizemode;
 };
 
 #endif // PARTICLE_H

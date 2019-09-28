@@ -28,22 +28,26 @@ SOURCES += \
     singleobjectdialog.cpp\
     main.cpp \
     multiobjectdialog.cpp \
-    singleobjectcore/pso.cpp \
-    singleobjectcore/particle.cpp \
     inputparamwidget.cpp \
     targetwidget.cpp \
     itemdelegate.cpp \
-    readonlydelegate.cpp
+    readonlydelegate.cpp \
+    singleobjectcore/spso.cpp \
+    singleobjectcore/sparticle.cpp \
+    multiobjectcore/particle.cpp \
+    multiobjectcore/pso.cpp
 
 HEADERS += \
     singleobjectdialog.h \
     multiobjectdialog.h \
-    singleobjectcore/pso.h \
-    singleobjectcore/particle.h \
     inputparamwidget.h \
     targetwidget.h \
     itemdelegate.h \
-    readonlydelegate.h
+    readonlydelegate.h \
+    singleobjectcore/spso.h \
+    singleobjectcore/sparticle.h \
+    multiobjectcore/particle.h \
+    multiobjectcore/pso.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

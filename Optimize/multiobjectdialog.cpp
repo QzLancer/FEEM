@@ -44,7 +44,7 @@ MultiObjectDialog::~MultiObjectDialog()
 }
 
 void MultiObjectDialog::initialize()
-{    
+{
     QPalette pe;
     pe.setColor(QPalette::WindowText, Qt::red);
     mWarningLabel->setPalette(pe);
@@ -123,27 +123,27 @@ void MultiObjectDialog::initializeGroup2()
 {
     mGroup2->setTitle(tr("Multiple target PSO parameters"));
 
-    //ç§ç¾¤å¤§å°
+    //ÖÖÈº´óÐ¡
     QLabel *sizelabel = new QLabel(tr("Number of Particles: "), mGroup2);
     QLineEdit *sizeedit = mSizeEdit;
 
-    //ç²’å­ç¾¤å¾ªçŽ¯æ¬¡æ•°
+    //Á£×ÓÈºÑ­»·´ÎÊý
     QLabel *timelabel = new QLabel(tr("Max iteration: "), mGroup2);
     QLineEdit *timeedit = mTimeEdit;
 
-    //ç²¾è‹±ç²’å­ç¾¤æ•°ç›®
+    //¾«Ó¢Á£×ÓÈºÊýÄ¿
     QLabel *elitelabel = new QLabel(tr("Number of eliet Particles: "), mGroup2);
     QLineEdit *eliteedit = mEliteEdit;
 
-    //å˜å¼‚æ¦‚çŽ‡
+    //±äÒì¸ÅÂÊ
     QLabel *ratelabel = new QLabel(tr("Mutation rate: "), mGroup2);
     QLineEdit *rateedit = mRateEdit;
 
-    //wä¸Šç•Œ
+    //wÉÏ½ç
     QLabel *wupperlabel = new QLabel(tr("Upper weight"), mGroup2);
     QLineEdit *wupperedit = mWUpperEdit;
 
-    //wä¸‹ç•Œ
+    //wÏÂ½ç
     QLabel *wlowerlabel = new QLabel(tr("Lower weight: "), mGroup2);
     QLineEdit *wloweredit = mWLowerEdit;
 
@@ -169,7 +169,7 @@ void MultiObjectDialog::initializeGroup2()
 
 bool MultiObjectDialog::isParamError()
 {
-    //åˆ¤æ–­è¾“å…¥å‚æ•°æ˜¯å¦ä¸ºç©º
+    //ÅÐ¶ÏÊäÈë²ÎÊýÊÇ·ñÎª¿Õ
     if(mTargetWidget->getTargetList().size() == 0){
         mWarningLabel->setText(tr("Error: Target is Empty!"));
         return false;

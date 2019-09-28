@@ -8,7 +8,7 @@
 #include <QList>
 #include <QItemSelectionModel>
 #include <QLabel>
-#include "singleobjectcore/pso.h"
+#include "singleobjectcore/spso.h"
 #include "inputparamwidget.h"
 
 class SingleObjectDialog : public QDialog
@@ -44,7 +44,8 @@ private:
     QStringList mInputList;
 
     //控件
-    QComboBox *mTargetBox; 
+    QComboBox *mTargetBox;
+    QComboBox *mModeBox;
 
     //所有的参数输入LineEdit
     QLineEdit *mSizeEdit;
@@ -58,7 +59,7 @@ private:
 
     InputParamWidget *mInputWidget;
     //求解器
-    static void objectiveFunction (Particle *Particle);
+    static void objectiveFunction (SParticle *Particle);
 };
 
 #endif // DIALOG_H

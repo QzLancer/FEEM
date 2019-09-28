@@ -1,35 +1,39 @@
-#include "particle.h"
+#include "sparticle.h"
 #include <cstdlib>
 #include <cstdio>
 #include <iostream>
 #include <exception>
+#include <QObject>
+#include <QDebug>
+
 using namespace std;
 
 #include <cmath>
 
-int Particle::numberOfVariables = 1;
+int SParticle::numberOfVariables = 1;
 
-const double *Particle::lowerBounds = NULL;
+const double *SParticle::lowerBounds = NULL;
 
-const double *Particle::upperBounds = NULL;
+const double *SParticle::upperBounds = NULL;
 
-const double *Particle::maxVelocity = NULL;
+const double *SParticle::maxVelocity = NULL;
 
-double Particle::c1 = 2;
+double SParticle::c1 = 2;
 
-double Particle::c2 = 2;
+double SParticle::c2 = 2;
 
-const double *Particle::weight = NULL;
+const double *SParticle::weight = NULL;
 
-void (*Particle::functionPtr) (Particle *);
+void (*SParticle::functionPtr) (SParticle *);
 
-Particle::Particle(int _numberOfVariables,
+SParticle::SParticle(int _numberOfVariables,
                 const double *_lowerBounds,
                 const double *_upperBounds,
                 const double *_vmax,
                 double _c1, double _c2,
                 const double *_weight,
-                void (*_functionPtr)(Particle *))
+                void (*_functionPtr)(SParticle *),
+                QString _optimizemode)
 {
     lowerBounds = _lowerBounds;
     upperBounds = _upperBounds;
@@ -49,18 +53,20 @@ Particle::Particle(int _numberOfVariables,
     velocity = new double [numberOfVariables] ;
     bestPosition = new double [numberOfVariables];
 
+    optimizemode = _optimizemode;
+
     inicializeParticle();
 }
 
 
-Particle::~Particle ()
+SParticle::~SParticle ()
 {
     delete [] position;
     delete [] velocity;
     delete [] bestPosition;
 }
 
-void Particle::inicializeParticle ()
+void SParticle::inicializeParticle ()
 {
     for (int i = 0; i < numberOfVariables; i++) {
         double random = static_cast<double>(rand()) / (static_cast<double>(RAND_MAX) + 1);
@@ -77,7 +83,7 @@ void Particle::inicializeParticle ()
 
 }
 
-void Particle::updateParticle (const double *globalBestPosition)
+void SParticle::updateParticle (const double *globalBestPosition)
 {
     double random1;
     double random2;
@@ -109,47 +115,55 @@ void Particle::updateParticle (const double *globalBestPosition)
     updateParticleBest ();
 }
 
-const double *Particle::getBestPosition ()
+const double *SParticle::getBestPosition ()
 {
     return bestPosition;
 }
 
-double Particle::getBestValue ()
+double SParticle::getBestValue ()
 {
     return bestValue;
 }
 
-bool Particle::getBestFeasible ()
+bool SParticle::getBestFeasible ()
 {
     return bestFeasible;
 }
 
-double Particle::getValue ()
+double SParticle::getValue ()
 {
     return value;
 }
 
-void Particle::setValue (double _value)
+void SParticle::setValue (double _value)
 {
-    value = _value;
+    if(optimizemode == QObject::tr("Maximize")){
+        value = _value;
+    }
+    else if(optimizemode == QObject::tr("Maximize")){
+        value = 1/_value;
+    }
+    else{
+        qDebug() << "Error: SParticle::setValue! ";
+    }
 }
 
-void Particle::setConstraits (double _constraits)
+void SParticle::setConstraits (double _constraits)
 {
     constraits = _constraits;
 }
 
-bool Particle::getFeasible ()
+bool SParticle::getFeasible ()
 {
     return feasible;
 }
 
-void Particle::setFeasible (bool _feasible)
+void SParticle::setFeasible (bool _feasible)
 {
     feasible = _feasible;
 }
 
-void Particle::printParticle ()
+void SParticle::printParticle ()
 {
     cout << "Position = ";
     for (int i = 0; i < numberOfVariables; i++)
@@ -160,7 +174,7 @@ void Particle::printParticle ()
     cout << "Feasible? " << (feasible ? "true" : "false") << endl;
 }
 
-void Particle::printParticleBest ()
+void SParticle::printParticleBest ()
 {
     cout << "Position = ";
     for (int i = 0; i < numberOfVariables; i++)
@@ -170,18 +184,18 @@ void Particle::printParticleBest ()
     cout << "Feasible? " << (bestFeasible ? "true" : "false") << endl;
 }
 
-int Particle::getNumberOfVariables ()
+int SParticle::getNumberOfVariables ()
 {
-    return Particle::numberOfVariables;
+    return SParticle::numberOfVariables;
 }
 
-const double *Particle::getPosition ()
+const double *SParticle::getPosition ()
 {
     return position;
 }
 
 ///private
-void Particle::updateParticleBest ()
+void SParticle::updateParticleBest ()
 {
     //improve this conditional
     if (feasible || !bestFeasible) {

@@ -1,12 +1,12 @@
-#include "pso.h"
+#include "spso.h"
 #include <QDebug>
 
-PSO::PSO()
+SPSO::SPSO()
 {
 
 }
 
-PSO::PSO(int _numberOfParticles, int _numberOfVariables, double *_lowerBounds, double *_upperBounds, double *_vmax, void (*_objectiveFunction)(Particle *), double _lowerWeight, double _upperWeight, int _maxIteration, double _c1, double _c2, double _threshold, QString _stoppingCriteria, QString _psoType)
+SPSO::SPSO(int _numberOfParticles, int _numberOfVariables, double *_lowerBounds, double *_upperBounds, double *_vmax, void (*_objectiveFunction)(SParticle *), double _lowerWeight, double _upperWeight, int _maxIteration, double _c1, double _c2, double _threshold, QString _optimizemode, QString _stoppingCriteria, QString _psoType)
 {
     int i = 0;
 
@@ -21,23 +21,24 @@ PSO::PSO(int _numberOfParticles, int _numberOfVariables, double *_lowerBounds, d
     if (numberOfParticles <= 0)
         throw "Number of particles can't be less or equal than zero.";
 
-    particles = new Particle *[numberOfParticles];
+    particles = new SParticle *[numberOfParticles];
 
     for ( i = 0; i < numberOfParticles; i++)
-        particles[i] = new Particle	(_numberOfVariables,
+        particles[i] = new SParticle	(_numberOfVariables,
                                      _lowerBounds,
                                      _upperBounds,
                                      _vmax,
                                      _c1, _c2,
                                      &weight,
-                                     _objectiveFunction);
+                                     _objectiveFunction,
+                                     _optimizemode);
 
     bestParticleIndex = 0;
 
     updateGlobalBest();
 }
 
-PSO::~PSO ()
+SPSO::~SPSO ()
 {
     for (int i = 0; i < numberOfParticles; i++)
         delete particles[i];
@@ -45,14 +46,14 @@ PSO::~PSO ()
 
 }
 
-void PSO::updateParticles ()
+void SPSO::updateParticles ()
 {
     for (int i = 0; i < numberOfParticles; i++) {
         particles[i]->updateParticle(particles[bestParticleIndex]->getBestPosition());
     }
 }
 
-void PSO::updateGlobalBest ()
+void SPSO::updateGlobalBest ()
 {
     for (int i = 0; i < numberOfParticles; i++)
         if (particles[i]->getFeasible() || !particles[bestParticleIndex]->getBestFeasible())
@@ -60,7 +61,7 @@ void PSO::updateGlobalBest ()
                 bestParticleIndex = i;
 }
 
-void PSO::optimize ()
+void SPSO::optimize ()
 {
     int i = 0;
 
@@ -77,7 +78,7 @@ void PSO::optimize ()
     qDebug() << i;
 }
 
-void PSO::printBest ()
+void SPSO::printBest ()
 {
     particles[bestParticleIndex]->printParticleBest();
 }

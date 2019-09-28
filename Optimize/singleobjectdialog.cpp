@@ -13,6 +13,7 @@ SingleObjectDialog::SingleObjectDialog(QWidget *parent)
       mGroup1(new QGroupBox(this)),
       mGroup2(new QGroupBox(this)),
       mTargetBox(new QComboBox(mGroup1)),
+      mModeBox(new QComboBox(mGroup1)),
       mSizeEdit(new QLineEdit(mGroup2)),
       mTimeEdit(new QLineEdit(mGroup2)),
       mRateEdit(new QLineEdit(mGroup2)),
@@ -37,6 +38,7 @@ SingleObjectDialog::~SingleObjectDialog()
     delete mRateEdit;
     delete mTimeEdit;
     delete mSizeEdit;
+    delete mModeBox;
     delete mTargetBox;
     delete mGroup2;
     delete mGroup1;
@@ -110,6 +112,8 @@ void SingleObjectDialog::slotOptimize()
     QList<QList<double>> InputValue = mInputWidget->getInputValue();
     if(isParamError()){
         qDebug() << "Input parameter OK!";
+        //优化形式
+        QString TargetMode = mModeBox->currentText();
         //将input parameter转换成可以传递的形式
         double *lower = new double[static_cast<unsigned long long>(InputValue.size())];
         double *upper = new double[static_cast<unsigned long long>(InputValue.size())];
@@ -143,11 +147,11 @@ void SingleObjectDialog::slotOptimize()
         qDebug() << "c1: " << c1;
         qDebug() << "c2: " << c2;
 
-        PSO pso(numberOfParticles, numberOfVariables, lower, upper, vmax, SingleObjectDialog::objectiveFunction, lowerWeight, upperWeight, maxIteration, c1, c2, threshold, stoppingCriteria, psoType);
+        SPSO SPSO(numberOfParticles, numberOfVariables, lower, upper, vmax, SingleObjectDialog::objectiveFunction, lowerWeight, upperWeight, maxIteration, c1, c2, threshold, TargetMode, stoppingCriteria, psoType);
 
-        pso.optimize();
+        SPSO.optimize();
 
-        pso.printBest();
+        SPSO.printBest();
 
         delete[] vmax;
         delete[] upper;
@@ -163,7 +167,7 @@ void SingleObjectDialog::initializeGroup1()
     QLabel *targetlabel = new QLabel(tr("Target to be optimized"), mGroup1);
     QLabel *modelabel = new QLabel(tr("Optimize Mode"), mGroup1);
     QComboBox *targetbox = mTargetBox;
-    QComboBox *modebox = new QComboBox(mGroup1);
+    QComboBox *modebox = mModeBox;
     modebox->addItem(tr("Minimize"));
     modebox->addItem(tr("Maximize"));
 
@@ -276,7 +280,7 @@ bool SingleObjectDialog::isParamError()
     return true;
 }
 
-void SingleObjectDialog::objectiveFunction(Particle *Particle)
+void SingleObjectDialog::objectiveFunction(SParticle *Particle)
 {
     const double *_position = Particle->getPosition ();
     double _constraits;
