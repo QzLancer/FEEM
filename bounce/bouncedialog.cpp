@@ -2,7 +2,7 @@
 #include <QVBoxLayout>
 #include "bouncecore.h"
 #include <QDebug>
-#include "qcustomplot.h"
+#include "plotwidget.h"
 #include <QPalette>
 
 BounceDialog::BounceDialog(QWidget *parent) : QDialog(parent),
@@ -69,10 +69,18 @@ void BounceDialog::Run()
         core.initSolveProperties(mData[tr("Initial time: ")], mData[tr("End time: ")], mData[tr("Step size: ")]);
         core.bounceCalculate();
 
-        QCustomPlot *cp = new QCustomPlot;
-        cp->show();
-        core.plot(cp);
+//        QCustomPlot *cp = new QCustomPlot;
+//        cp->setInteractions(MYQCP::iRangeZoom | MYQCP::iRangeDrag);
+//        cp->show();
+//        core.plot(cp);
 
+        PlotWidget *pw = new PlotWidget;
+//        pw->show();
+//        core.plot(pw->mCustomPlot);
+//        pw->mCustomPlot->replot();
+        pw->addPlot(core.gett(), core.getxd());
+        pw->addPlot(core.gett(), core.getxx());
+        pw->show();
         close();
     }
 }
@@ -108,39 +116,58 @@ void BounceDialog::initialization()
 void BounceDialog::addMaterialPropertiesTab()
 {
     BounceTab *materialpropertiestab = new BounceTab(this);
-    materialpropertiestab->addLine(tr("Open distance: "));
-    materialpropertiestab->addLine(tr("Stroke: "));
-    materialpropertiestab->addLine(tr("Moving contact mass: "));
-    materialpropertiestab->addLine(tr("Armature mass: "));
+//    materialpropertiestab->addLine(tr("Open distance: "));
+//    materialpropertiestab->addLine(tr("Stroke: "));
+//    materialpropertiestab->addLine(tr("Moving contact mass: "));
+//    materialpropertiestab->addLine(tr("Armature mass: "));
+
+    materialpropertiestab->addLine("0.0017", tr("Open distance: "));
+    materialpropertiestab->addLine("0.00268", tr("Stroke: "));
+    materialpropertiestab->addLine("0.007", tr("Moving contact mass: "));
+    materialpropertiestab->addLine("0.0129", tr("Armature mass: "));
     mTabWidget->addTab(materialpropertiestab, tr("Material properties"));
 }
 
 void BounceDialog::addSpringReactionForceTab()
 {
     BounceTab *springreactionforcetab = new BounceTab(this);
-    springreactionforcetab->addLine(tr("Stiffness of overtravel spring: "));
-    springreactionforcetab->addLine(tr("Stiffness of return spring: "));
-    springreactionforcetab->addLine(tr("Pre-pressure of overtravel spring: "));
-    springreactionforcetab->addLine(tr("Pre-pressure of return spring: "));
+//    springreactionforcetab->addLine(tr("Stiffness of overtravel spring: "));
+//    springreactionforcetab->addLine(tr("Stiffness of return spring: "));
+//    springreactionforcetab->addLine(tr("Pre-pressure of overtravel spring: "));
+//    springreactionforcetab->addLine(tr("Pre-pressure of return spring: "));
+
+    springreactionforcetab->addLine("13000", tr("Stiffness of overtravel spring: "));
+    springreactionforcetab->addLine("370", tr("Stiffness of return spring: "));
+    springreactionforcetab->addLine("7", tr("Pre-pressure of overtravel spring: "));
+    springreactionforcetab->addLine("6", tr("Pre-pressure of return spring: "));
     mTabWidget->addTab(springreactionforcetab, tr("Spring reaction force"));
 }
 
 void BounceDialog::addCollisionContactTab()
 {
     BounceTab *collisioncontacttab = new BounceTab(this);
-    collisioncontacttab->addLine(tr("Stiffness: "));
-    collisioncontacttab->addLine(tr("Depth: "));
-    collisioncontacttab->addLine(tr("Damping: "));
-    collisioncontacttab->addLine(tr("Index: "));
+//    collisioncontacttab->addLine(tr("Stiffness: "));
+//    collisioncontacttab->addLine(tr("Depth: "));
+//    collisioncontacttab->addLine(tr("Damping: "));
+//    collisioncontacttab->addLine(tr("Index: "));
+
+    collisioncontacttab->addLine("5.3e+8", tr("Stiffness: "));
+    collisioncontacttab->addLine("0.0001", tr("Depth: "));
+    collisioncontacttab->addLine("1000", tr("Damping: "));
+    collisioncontacttab->addLine("1.5", tr("Index: "));
     mTabWidget->addTab(collisioncontacttab, tr("Collision contact"));
 }
 
 void BounceDialog::addSolvePropertiesTab()
 {
     BounceTab *solvepropertiestab = new BounceTab(this);
-    solvepropertiestab->addLine(tr("Initial time: "));
-    solvepropertiestab->addLine(tr("End time: "));
-    solvepropertiestab->addLine(tr("Step size: "));
+//    solvepropertiestab->addLine(tr("Initial time: "));
+//    solvepropertiestab->addLine(tr("End time: "));
+//    solvepropertiestab->addLine(tr("Step size: "));
+
+    solvepropertiestab->addLine("0", tr("Initial time: "));
+    solvepropertiestab->addLine("0.08", tr("End time: "));
+    solvepropertiestab->addLine("0.00001", tr("Step size: "));
     mTabWidget->addTab(solvepropertiestab, tr("Solve properties"));
 }
 

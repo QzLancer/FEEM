@@ -166,6 +166,21 @@ void BounceCore::plot(QCustomPlot *widget)
     widget->replot();
 }
 
+QVector<double> BounceCore::gett() const
+{
+    return t;
+}
+
+QVector<double> BounceCore::getxd() const
+{
+    return xd;
+}
+
+QVector<double> BounceCore::getxx() const
+{
+    return xx;
+}
+
 /*!
  *  @brief 读取excel中的矩阵
  */

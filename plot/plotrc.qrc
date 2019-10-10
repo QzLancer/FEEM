@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/icon">
+        <file>resource/reset_32px.png</file>
+        <file>resource/tracer_32px.png</file>
+        <file>resource/translation_32px.png</file>
+        <file>resource/zoomin_32px.png</file>
+        <file>resource/zoomout_32px.png</file>
+    </qresource>
+</RCC>

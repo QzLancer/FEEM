@@ -17,3 +17,11 @@ void BounceTab::addLine(QString labelname)
     mFLayout.addRow(labelname, lineedit);
     mFLayout.setSpacing(10);
 }
+
+void BounceTab::addLine(QString initialstr, QString labelname)
+{
+    QLineEdit *lineedit = new QLineEdit(initialstr, this);
+    mLineEditMap->insert(labelname, lineedit);
+    mFLayout.addRow(labelname, lineedit);
+    mFLayout.setSpacing(10);
+}

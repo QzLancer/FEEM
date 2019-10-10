@@ -28,6 +28,9 @@ public:
     void initSolveProperties(double initial_time, double end_time, double step_size);
     void bounceCalculate();
     void plot(QCustomPlot *widget);
+    QVector<double> gett() const;
+    QVector<double> getxd() const;
+    QVector<double> getxx() const;
 
 private:
 	QList<QList<double>> readExcel(QString fileName);

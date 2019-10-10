@@ -29,17 +29,13 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
     bouncecore.cpp \
-    qcustomplot.cpp \
     bouncetab.cpp \
     bouncedialog.cpp \
 
 HEADERS += \
     bouncecore.h \
-    qcustomplot.h \
     bouncetab.h \
     bouncedialog.h \
-
-QT += axcontainer
 
 DESTDIR = $$PWD/bin
 
@@ -47,5 +43,9 @@ DESTDIR = $$PWD/bin
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+include($$PWD/../plot/plotwidget.pri)
+
+QT += axcontainer
 
 TRANSLATIONS += zh_CN.ts

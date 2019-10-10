@@ -16,6 +16,7 @@ class BounceTab : public QWidget
 public:
     explicit BounceTab(BounceDialog *parent = nullptr);
     void addLine(QString labelname);
+    void addLine(QString initialstr, QString labelname);
 
 signals:
 
